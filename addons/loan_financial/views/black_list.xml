@@ -1,0 +1,75 @@
+<odoo>
+  <data>
+    <!-- views -->
+    <record model="ir.ui.view" id="list_black_list">
+        <field name="name">黑名单列表</field>
+        <field name="model">black.list</field>
+        <field name="arch" type="xml">
+            <tree create='0' import="0" export_xlsx="0">
+                <header>
+                    <button class="btn-primary" name="action_create" type="object" string="新增" display="always"/>
+                </header>
+                <field name="phone_no"/>
+                <field name="user_name"/>
+                <field name="id_card_no"/>
+                <field name="bank_account_no"/>
+                <field name="reason"/>
+                <field name="create_date" optional="show" string="录入时间"/>
+                <field name="create_uid" optional="show" string="操作人"/>
+                
+                <field name="write_uid" optional="hide"/>
+                <field name="write_date" optional="hide"/>
+                
+                <button name="action_edit" type="object" string="编辑"/>
+                <button name="toggle_active" type="object" string="删除" confirm="删除后不可恢复, 确认删除?"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="search_black_list">
+        <field name="name">黑名单搜索</field>
+        <field name="model">black.list</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="phone_no"/>
+                <field name="user_name"/>
+                <field name="id_card_no"/>
+                <field name="bank_account_no"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="form_black_list">
+        <field name="name">黑名单详情</field>
+        <field name="model">black.list</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <field name="id" invisible="1"/>
+                    <group>
+                        <field name="phone_no"/>
+                        <field name="user_name"/>
+                        <field name="id_card_no"/>
+                        <field name="bank_account_no"/>
+                        <field name="reason"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="取消" class="btn btn-default" special="cancel"/>
+                    <button string="确认" special="save" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <!-- actions opening views on models -->
+
+    <record model="ir.actions.act_window" id="act_black_list">
+        <field name="name">黑名单管理</field>
+        <field name="res_model">black.list</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+  </data>
+</odoo>
