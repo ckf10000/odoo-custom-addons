@@ -97,7 +97,7 @@ class PayController(http.Controller):
             trade_no = trade_data.get('mchOrderNo')
             trade_status = "2" if trade_data.get("code") == 1 else "3"
             platform_order_no = trade_data.get('payOrderId')
-            trade_amount = round(trade_data.get('orderAmount', 0) * 100, 2)
+            trade_amount = round(trade_data.get('orderAmount', 0) / 100, 2)
             trade_end_time = trade_data.get('paySuccessTime')
             if trade_end_time:
                 trade_end_time = datetime.datetime.fromtimestamp(trade_end_time / 1000)
@@ -114,7 +114,7 @@ class PayController(http.Controller):
                 trade_status = "1"
 
             platform_order_no = trade_data.get('platformOrderNo')
-            trade_amount = float(trade_data.get('amount', 0) )
+            trade_amount = float(trade_data.get('realAmount', 0) )
             trade_end_time = datetime.datetime.now()
         
         trade_data = {

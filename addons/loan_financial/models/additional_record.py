@@ -37,7 +37,8 @@ class AdditionalRecord(models.Model):
     
     approval_user_id = fields.Many2one('res.users', string="审核人")
     approval_time = fields.Datetime('审核时间')
-    close_reason_id = fields.Many2one('additional.record.close.reason', string='关单原因')
+    close_reason = fields.Char('关单原因')
+    close_reason_id = fields.Many2one('additional.record.close.reason', string='关联关单原因', ondelete="set null")
 
     payment_setting_id = fields.Many2one('payment.setting', string='支付渠道', domain="[('use_type', '=', '2')]")
     platform_order_no = fields.Char(string='支付订单号')
@@ -81,6 +82,13 @@ class AdditionalRecord(models.Model):
         obj = super(AdditionalRecord, self).create(vals)
         return obj
     
+    @api.onchange('close_reason_id')
+    def onchange_close_reason_id(self):
+        if self.close_reason_id:
+            self.close_reason = self.close_reason_id.text
+        else:
+            self.close_reason = ''
+
     def action_show_additional_record(self):
         return {
             'name': '补单记录',
@@ -161,6 +169,11 @@ class AdditionalRecord(models.Model):
         if trade_record.trade_status == "3":
             return
         
+        self.write({
+            "status": "3",
+            "update_time": now
+        })
+        
         if self.addition_type == '1':
             self.repay_order_id.after_payment(trade_record)
         else:
@@ -211,14 +224,16 @@ class AdditionalRecord(models.Model):
         """
         模拟支付补单费用
         """
+        now = fields.Datetime.now()
         self.write({
-            'status': '2',
+            'status': '3',
             'approval_user_id': self.env.user.id,
-            'approval_time': fields.Datetime.now()
+            'approval_time': now,
+            "update_time": now
         })
 
         trade_no = self.env['ir.sequence'].next_by_code('trade_record_no_seq')
-        now = fields.Datetime.now()
+        
         # 创建交易记录
         trade_data = {
             'order_id': self.order_id.id,
@@ -255,5 +270,6 @@ class AdditionalRecordCloseReason(models.Model):
     sequence = fields.Integer(string='排序', default=0)
     
 
-
+    def test(self):
+        pass
 

@@ -57,14 +57,15 @@ class ResUsers(models.Model):
         
         if 'bill_search' in self.env.context:
             if self.env.context['bill_search'] == 'manual.allocation.wizard':
-                cache_data = {str(key): value for key,value in dict(self.env.cache._data).items()}                    
-                collection_stage_dict = cache_data.get("manual.allocation.wizard.collection_stage")                    
-                if collection_stage_dict and isinstance(collection_stage_dict, dict):                        
-                    temp_context = dict(collection_stage=next(iter(collection_stage_dict.values())))                        
-                    temp_context.update(self.env.context)                        
-                    self.env.context = temp_context                    
-                else:                        
-                    return
+                if "collection_stage" not in self.env.context:
+                    cache_data = {str(key): value for key, value in dict(self.env.cache._data).items()}
+                    collection_stage_dict = cache_data.get("manual.allocation.wizard.collection_stage")
+                    if collection_stage_dict and isinstance(collection_stage_dict, dict):
+                        temp_context = dict(collection_stage=next(iter(collection_stage_dict.values())))
+                        temp_context.update(self.env.context)
+                        self.env.context = temp_context
+                    else:
+                        return
                 
                 # 先找出 催收员“是否进件”状态为“开启”、“催收阶段”与所选择订单的“催收阶段”一致的记录
                 points_ids = self.env['collection.points'].sudo().search([('is_input', '=', True), ('collection_stage', '=', self.env.context['collection_stage'])])

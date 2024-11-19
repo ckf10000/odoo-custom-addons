@@ -3,6 +3,14 @@
         padding: 10px 50px;
         background-color: #eee;
 
+        .o_control_panel_breadcrumbs {
+            min-width: initial;
+        }
+        .btn {
+            line-height: 1;
+            white-space: nowrap;
+        }
+
         .o_content {
             margin-top: 10px;
             .o_list_renderer {
@@ -41,6 +49,11 @@
     line-height: 1;
 }
 .o_dialog {
+    .modal-header {
+        .modal-title {
+            font-weight: bold;
+        }
+    }
     .modal-footer {
         justify-content: flex-end !important;
     }

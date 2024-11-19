@@ -13,7 +13,6 @@ class DerateRecord(models.Model):
     _table = 'F_derate_record'
 
     order_id = fields.Many2one('loan.order', string="订单编号", required=True, index=True, auto_join=True)
-    repay_order_id = fields.Many2one('repay.order', string="还款订单", required=True, index=True, auto_join=True)
     order_no = fields.Char(string='订单编号', related="order_id.order_no")
     loan_uid = fields.Integer('UserID', related='order_id.loan_uid')
     loan_user_name = fields.Char(string='姓名', related='order_id.loan_user_name')
@@ -73,6 +72,13 @@ class DerateRecord(models.Model):
         """
         检查减免数据
         """
+        order_id = data['order_id']
+        exist_rec = self.env[self._name].search([('order_id', '=', order_id), '|', ('col_approval_status', '=', '1'), ('fin_approval_status', '=', '1')])
+        _logger.info("exist_rec: %s" % exist_rec)
+        if exist_rec:
+            stage = "催收" if exist_rec[0].col_approval_status == 1 else "财务"
+            raise exceptions.ValidationError(f"存在{stage}未完成审核的减免记录, 完成后才能再次减免!")
+
         errors = [] 
         derate_amount, max_derate_amount = data['derate_amount'], data['max_derate_amount']
         if derate_amount <= 0:
@@ -93,27 +99,176 @@ class DerateRecord(models.Model):
             "derate_no": self.env['ir.sequence'].next_by_code('derate_record_seq'),
             'app_version': order.app_version,
             'apply_user_id': self.env.user.id,
-            'apply_time': fields.Datetime.now(),
-            'fin_approval_status': "1"
+            'apply_time': fields.Datetime.now()
         })
-        return super(DerateRecord, self).create(vals)
+        obj = super(DerateRecord, self).create(vals)
+        return obj
+    
+    def fin_approval(self, approval_data):
+        """
+        财务减免审核
+        """
+        self.write(approval_data)
+        if self.fin_approval_status == "2":
+            self.env['platform.flow'].create({
+                "order_id": self.order_id.id,
+                "flow_type": enums.FLOW_TYPE[0][0],
+                "flow_amount": self.derate_amount,
+                "trade_type": enums.TRADE_TYPE[20][0],
+                "flow_time": self.fin_approval_time
+            })
 
-    def action_show_approval_wizard(self):
-        approve_flag = self.env.context.get('flag', 0)
+            repay_order = self.order_id.get_repay_order()
+            repay_order.update_repay_status(self.fin_approval_time)
+
+    def col_approval(self, approval_data):
+        """
+        催收减免审核
+        """
+        self.write(approval_data)
+        if self.col_approval_status == "2":
+            self.action_fin_create()
+
+    def action_fin_create(self):
+        """
+        财务创建减免记录
+        """
+        auto_pass = self.env['loan.order.settings'].get_param('fin_derate_auto_approval', False)
+        if auto_pass:
+            max_amount = self.env['loan.order.settings'].get_param('fin_derate_auto_approval_max_amount', 0)
+            if self.derate_amount > max_amount:
+                return
+            
+            self.fin_approval({
+                'fin_approval_status': '2',
+                'fin_approval_user_id': self.env.user.id,
+                'fin_approval_time': self.apply_time,
+                'fin_approval_remark': '自动审核通过',
+                'is_effective': True
+            })
+    
+    def _action_show_derate_setting_wizard(self, context={}):
+        context.update({
+            'dialog_size': self._action_default_size(),
+        })
         return {
-            'name': '审核通过' if approve_flag else '审核拒绝',
+            'name': '自动审核配置',
+            'type': 'ir.actions.act_window',
+            'res_model': "derate.record.setting.wizard",
+            'view_mode': 'form',
+            'view_id': self.env.ref('loan_financial.wizard_derate_setting').id,
+            'target': 'new',
+            'context': context
+        }
+
+    def action_fin_derate_setting(self):
+        """
+        财务减免设置
+        """
+        auto_pass = self.env['loan.order.settings'].get_param('fin_derate_auto_approval', False)
+        max_amount = self.env['loan.order.settings'].get_param('fin_derate_auto_approval_max_amount', 0)
+        context = {
+            'default_setting_type': '1',
+            'default_auto_pass': auto_pass,
+            'default_max_amount': max_amount,
+        }
+        return self._action_show_derate_setting_wizard(context)
+
+    def _action_show_approval_wizard(self, action_name, context={}):
+        context.update({
+            'dialog_size': self._action_default_size(),
+            'default_derate_id': self.id,
+            **context
+        })
+        return {
+            'name': action_name,
             'type': 'ir.actions.act_window',
             'res_model': "derate.record.approval.wizard",
             'view_mode': 'form',
+            'view_id': self.env.ref('loan_financial.wizard_fin_derate_approval').id,
             'target': 'new',
-            'context': {
-                'dialog_size': self._action_default_size(),
-                'default_derate_id': self.id,
-                'default_stage': '2',
-                'default_status': "2" if approve_flag else "3",
-                'default_desc': f"{self.derate_amount}, 否确定审核{'通过' if approve_flag else '拒绝'}?"
-            }
+            'context': context
         }
+    
+    def action_show_fin_approval(self):
+        approve_flag = self.env.context.get('flag', 0)
+        name = '审核通过' if approve_flag else '审核拒绝',
+        return self._action_show_approval_wizard(name, {
+            'default_approval_type': "1",
+            'default_approval_result': "2" if approve_flag else "3",
+            'default_desc': f"{self.derate_amount}, 否确定审核{'通过' if approve_flag else '拒绝'}?"
+        })
+    
+    def _action_show_batch_approval_wizard(self, context):
+        amount = round(sum(self.mapped(lambda x: x.derate_amount)), 2)
+        context = {
+            'dialog_size': self._action_default_size(),
+            'default_derate_record_ids': self.ids,
+            'default_desc': f"{len(self.ids)}, 合计申请减免金额:{amount}",
+            **context
+        }
+        return {
+            'name': '批量审核',
+            'type': 'ir.actions.act_window',
+            'res_model': "derate.record.batch.approval.wizard",
+            'view_mode': 'form',
+            'view_id': self.env.ref('loan_financial.wizard_fin_derate_batch_approval').id,
+            'target': 'new',
+            'context': context
+        }
+    
+    def action_fin_derate_batch_approval(self):   
+        if not self.ids:
+            raise exceptions.UserError('请先勾选需要批量审核的订单！')
+        
+        return self._action_show_batch_approval_wizard({'default_approval_type': '1'})
+        
+
+class DerateRecordSettingWizard(models.TransientModel):
+    _name = 'derate.record.setting.wizard'
+    _description = '减免记录配置向导'
+    _inherit = ['loan.basic.model']
+
+    setting_type = fields.Selection([('1', '财务'), ('2', '催收')], string="设置类型")
+    auto_pass = fields.Boolean(string="自动审核")
+    max_amount = fields.Integer(string="最大减免金额")
+
+    def action_setting(self):
+        if self.setting_type == '1':
+            key1 = "fin_derate_auto_approval"
+            key2 = "fin_derate_auto_approval_max_amount"
+        else:
+            key1 = "col_derate_auto_approval"
+            key2 = "col_derate_auto_approval_max_amount"
+
+        self.env['loan.order.settings'].set_param(key1, self.auto_pass)
+        self.env['loan.order.settings'].set_param(key2, self.max_amount)
+
+        if not self.auto_pass:
+            return 
+        
+        # 自动审核
+        if self.setting_type == "1":
+            derate_rec_data = {
+                'fin_approval_status': "2",
+                'fin_approval_user_id': self.env.user.id,
+                'fin_approval_time': fields.Datetime.now(),
+                'fin_approval_remark': '自动审核通过',
+                'is_effective': True 
+            }
+            for obj in self.env['derate.record'].search([('fin_approval_status', '=', '1'), ('derate_amount', '<=', self.max_amount)]):
+                obj.fin_approval(derate_rec_data)
+        else:
+            derate_rec_data = {
+                'col_approval_status': "2",
+                'col_approval_user_id': self.env.user.id,
+                'col_approval_time': fields.Datetime.now(),
+                'col_approval_remark': '自动审核通过',
+                'fin_approval_status': '1' 
+            }
+            for obj in self.env['derate.record'].search([('col_approval_status', '=', '1'), ('derate_amount', '<=', self.max_amount)]):
+                obj.col_approval(derate_rec_data)
+        return 
 
 
 class DerateRecordApprovalWizard(models.TransientModel):
@@ -121,48 +276,77 @@ class DerateRecordApprovalWizard(models.TransientModel):
     _description = '减免记录审核向导'
     _inherit = ['loan.basic.model']
 
+    approval_type = fields.Selection([('1', '财务'), ('2', '催收')], string="审核类型")
     derate_id = fields.Many2one('derate.record', string="减免记录", required=True)
-    stage = fields.Selection([('1', "催收审核"), ('2', "财务审核")], string='审核阶段')
     desc = fields.Text(string='审核描述')
-    status = fields.Selection(enums.DERATE_APPROVAL_STATUS, '结论')
+    approval_result = fields.Selection([('2', '通过'), ('3', '拒绝')], string='批量审核')
     remark = fields.Text(string='备注', required=True)
-    user_id = fields.Many2one('res.users', string="审核人", default=lambda self: self.env.user.id)
 
-    def create(self, vals):
-        obj = super().create(vals)
-
-        derate_rec_data = {}
-        now = fields.Datetime.now()
-        if obj.stage == '1':
-            derate_rec_data.update({
-                'col_approval_status': obj.status,
-                'col_approval_user_id': self.env.user.id,
-                'col_approval_time': now,
-                'col_approval_remark': obj.remark,
-            })
-        else:
-            derate_rec_data.update({
-                'fin_approval_status': obj.status,
+    def action_approval(self):
+        """
+        财务审核
+        """
+        if self.approval_type == "1":
+            derate_rec_data = {
+                'fin_approval_status': self.approval_result,
                 'fin_approval_user_id': self.env.user.id,
-                'fin_approval_time': now,
-                'fin_approval_remark': obj.remark,
-                'is_effective': True if obj.status == "2" else False
-            })
-            obj.derate_id.write(derate_rec_data)
-
-            # 流水
-            if obj.status == '2':
-                self.env['platform.flow'].create({
-                    "order_id": obj.derate_id.order_id.id,
-                    "flow_type": enums.FLOW_TYPE[0][0],
-                    "flow_amount": obj.derate_id.derate_amount,
-                    "trade_type": enums.TRADE_TYPE[20][0],
-                    "flow_time": now
-                })
+                'fin_approval_time': fields.Datetime.now(),
+                'fin_approval_remark': self.remark,
+                'is_effective': True if self.approval_result == "2" else False
+            }
+            self.derate_id.fin_approval(derate_rec_data)
+        else:
+            derate_rec_data = {
+                'col_approval_status': self.approval_result,
+                'col_approval_user_id': self.env.user.id,
+                'col_approval_time': fields.Datetime.now(),
+                'col_approval_remark': self.remark,
+                'fin_approval_status': '1' if self.approval_result == "2" else '0',
+            }
+            self.derate_id.col_approval(derate_rec_data)
             
-                obj.derate_id.repay_order_id.update_repay_status(now)
-        return obj
 
+class DerateRecordBatchApprovalWizard(models.TransientModel):
+    _name = 'derate.record.batch.approval.wizard'
+    _description = '批量审核向导'
+    _inherit = ['loan.basic.model']
 
+    approval_type = fields.Selection([('1', '财务'), ('2', '催收')], string="审核类型")
+    derate_record_ids = fields.Json(string='减免记录', required=True)
+    desc = fields.Char(string='已选择订单数量')
+    approval_result = fields.Selection([('2', '通过'), ('3', '拒绝')], string='批量审核')
+    remark = fields.Text(string='备注', required=True)
 
+    @api.onchange("approval_result")
+    def _onchange_approval_result(self):
+        if self.approval_result == '2':
+            self.remark = '无异常通过'
+        else:
+            self.remark = ''
 
+    def action_approval(self):
+        """
+        财务审核
+        """
+        if self.approval_type == "1":
+            derate_rec_data = {
+                'fin_approval_status': self.approval_result,
+                'fin_approval_user_id': self.env.user.id,
+                'fin_approval_time': fields.Datetime.now(),
+                'fin_approval_remark': self.remark,
+                'is_effective': True if self.approval_result == "2" else False
+            }
+        else:
+            derate_rec_data = {
+                'col_approval_status': self.approval_result,
+                'col_approval_user_id': self.env.user.id,
+                'col_approval_time': fields.Datetime.now(),
+                'col_approval_remark': self.remark,
+                'fin_approval_status': '1' if self.approval_result == "2" else '0',
+            }
+
+        for derate_record in self.env['derate.record'].browse(self.derate_record_ids):
+            if self.approval_type == "1":
+                derate_record.fin_approval(derate_rec_data)
+            else:
+                derate_record.col_approval(derate_rec_data)

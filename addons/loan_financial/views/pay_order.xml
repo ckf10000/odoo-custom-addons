@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="apply_time">
                 <header>
-                    <button name="action_update_order_settings" type="object" string="已关闭" icon="fa-toggle-off" help="自动放款已关闭" class="oe_highlight1" display="always" invisible="context.get('is_auto_pay')!='0'" confirm="是否确定【开启】自动放款？"/>
-                    <button name="action_update_order_settings" type="object" string="已开启" icon="fa-toggle-on" help="自动放款已开启" class="oe_highlight" display="always" invisible="context.get('is_auto_pay')=='0'" confirm="是否确定【关闭】自动放款？"/>
+                    <button name="action_update_order_settings" type="object" string="已关闭" icon="fa-toggle-off" help="自动放款已关闭" class="oe_highlight1" display="always" invisible="context.get('is_auto_pay')" confirm="是否确定【开启】自动放款？"/>
+                    <button name="action_update_order_settings" type="object" string="已开启" icon="fa-toggle-on" help="自动放款已开启" class="oe_highlight" display="always" invisible="not context.get('is_auto_pay')" confirm="是否确定【关闭】自动放款？"/>
                     <button name="action_show_pay_order_wizard" context="{'batch_approve_flag': True}" type="object" string="批量审核" class="oe_highlight"/>
                 </header>
                 <field name="order_no"/>
@@ -266,12 +266,12 @@
             <form edit="0">
                 <sheet>
                     <group>
-                        <field name="order_loan_amount" string="金额"/>
-                        <field name="pay_voucher" string="描述"/>
-                        <field name="pay_complete_time" string="放款时间" readonly="1"/>
-                        <field name="financial_user_id" string="放款人姓名" options="{'no_open': 1}"/>
-                        <field name="order_bank_account_no" string="收款账号"/>
-                        <field name="payment_way_id" string="收款方式" options="{'no_open': 1}"/>
+                        <field name="order_loan_amount" string="Amount"/>
+                        <field name="pay_voucher" string="Description"/>
+                        <field name="pay_complete_time" string="Time" readonly="1"/>
+                        <field name="financial_user_id" string="Name" options="{'no_open': 1}"/>
+                        <field name="order_bank_account_no" string="Account Number"/>
+                        <field name="payment_way_id" string="Method" options="{'no_open': 1}"/>
                     </group>
                 </sheet>
                 <footer>
@@ -356,7 +356,7 @@
         <field name="model_id" ref="model_loan_order"/>
         <field name="state">code</field>
         <field name="code">
-            action = model.action_show_par_status_1_list()
+            action = model.action_show_pay_status_1_list()
         </field>
     </record>
     <!-- <record model="ir.actions.act_window" id="act_pay_order_s1">

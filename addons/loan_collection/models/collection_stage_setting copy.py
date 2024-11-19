@@ -23,8 +23,7 @@ class CollectionStageSetting(models.Model):
     status = fields.Boolean(string='状态', default=True)
     status_select = fields.Selection([('active', '开启'), ('stop', '关闭')], string='状态', compute='compute_status_select', store=True)
     history_ids = fields.One2many('collection.stage.setting.history', 'collection_stage_setting_id', string='历史记录')
-    write_date = fields.Datetime(string='最近编辑时间', timezone='Asia/Kolkata')
-    
+
     @api.depends('min_day', 'max_day')
     def compute_overdue_days(self):
         """拼接逾期天数范围"""
@@ -209,22 +208,8 @@ class CollectionStageSetting(models.Model):
             i.user_id.id: i
             for i in self.env["user.contact"].sudo().search([("user_id", "in", loan_order_ids.mapped("loan_user_id").ids)])
         }
-        order_nos = loan_order_ids.mapped("order_no")
-        user_address_book_dict = {}
-        for i in self.env["collection.user.address.book"].sudo().search([('order_no', 'in', order_nos)]):
-            if not i.order_no:
-                continue
-            user_address_book_dict.setdefault(i.order_no, []).append(i.id)
-
-        user_call_record_dict = {}
-        for i in self.env["collection.user.call.record"].sudo().search([('order_no', 'in', order_nos)]):
-            if not i.order_no:
-                continue
-            user_call_record_dict.setdefault(i.order_no, []).append(i.id)
-
-        status_id = self.env["collection.order.status"].sudo().search([("code", "=", "1")], limit=1).id
         for loan_order in loan_order_ids:
-            overdue_days = (date.today() - loan_order.repay_date).days
+            overdue_days = (date.today() - loan_order.repayin_date).days
             collection_stage_setting_id = (
                 self.env["collection.stage.setting"]
                 .sudo()
@@ -285,12 +270,13 @@ class CollectionStageSetting(models.Model):
                     ]
                     values.append(
                         {
-                            "order_status_id": status_id,
+                            "order_status_id": self.env["collection.order.status"]
+                            .sudo()
+                            .search([("code", "=", "1")], limit=1)
+                            .id,
                             "loan_order_id": loan_order.id,
                             "collection_stage_setting_id": collection_stage_setting_id.id,
-                            "collection_user_contact_ids": collection_user_contacts if user_contact else [],
-                            "user_address_book_ids":[(6, 0, user_address_book_dict.get(loan_order.order_no, []))],
-                            "user_call_record_ids": [(6, 0, user_call_record_dict.get(loan_order.order_no, []))],
+                            "collection_user_contact_ids": collection_user_contacts if user_contact else []
                         }
                     )
 
@@ -337,7 +323,6 @@ class CollectionStageSetting(models.Model):
                     acceptable_attrs[points_id.user_id] = points_id.loan_product_ids
 
             distribute_orders(allot_order_ids, limits, acceptable_attrs)
-
 
 class CollectionStageSettingHistory(models.Model):
     _name = 'collection.stage.setting.history'

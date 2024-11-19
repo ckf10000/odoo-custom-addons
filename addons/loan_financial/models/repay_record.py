@@ -32,7 +32,7 @@ class RepayRecord(models.Model):
     order_late_fee = fields.Float('滞纳金', related="order_id.late_fee")
 
     # 支付数据
-    repay_type = fields.Selection(enums.REPAY_TYPE, string='收款类型')
+    repay_type = fields.Selection(enums.REPAY_RECORD_TYPE, string='收款类型')
     repay_time = fields.Datetime(string='支付成功时间')
     platform_order_no = fields.Char(string='还款序列号')
     merchant_order_no = fields.Char(string='还款支付ID')
@@ -52,7 +52,7 @@ class RepayRecord(models.Model):
     write_off_amount = fields.Float(string='销账金额', compute="_compute_write_off_amount")
     pending_amount = fields.Float('剩余挂账金额', compute="_compute_write_off_amount")
 
-    is_cancel = fields.Boolean(string='是否取消', default=False, required=True)
+    is_cancel = fields.Boolean(string='是否取消', default=False)
     cancel_time = fields.Datetime(string='取消时间')
     cancel_user_id = fields.Many2one('res.users', string='操作人')
     cancel_remark = fields.Text(string='取消备注')
@@ -101,10 +101,14 @@ class RepayRecord(models.Model):
             return vals
         
         order = repay_order.order_id
-
-        order_money = order.unpaid_contract_amount # 待还金额
-        order_overdue_fee = order.unpaid_overdue_fee # 待还罚息
-        order_late_fee = order.unpaid_late_fee  # 待还滞纳金
+        if order.order_status == '8':
+            order_money = 0
+            order_overdue_fee = 0
+            order_late_fee = 0
+        else:
+            order_money = order.unpaid_contract_amount # 待还金额
+            order_overdue_fee = order.unpaid_overdue_fee # 待还罚息
+            order_late_fee = order.unpaid_late_fee  # 待还滞纳金
 
         principal, overdue_fee, late_fee, platform_profit = 0,0,0,0
         if amount <= order_money:

@@ -21,8 +21,8 @@
                 <field name="loan_period" optional="show" width="150px"/>
                 <field name="apply_time" optional="show" width="150px"/>
                 <field name="platform_profit" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
+                <field name="payment_setting_id" optional="show" width="150px" string="退款渠道"/>
+                <field name="payment_way_id" optional="show" width="150px" string="退款方式"/>
                 <field name="loan_user_unrepay_order_count" optional="show" width="150px"/>
                 
                 <button name="action_show_refund_wizard" type="object" string="退款" context="{'refund_type': '1'}"/>
@@ -67,7 +67,7 @@
                         <field name="bank_account_no"  readonly="1" force_save="1"/>
                         <field name="platform_profit" readonly="1" force_save="1"/>
                         <field name="refund_amount" required="1"/>
-                        <field name="refund_remark" required="1"/>
+                        <field name="refund_remark" />
                     </group>
                 </sheet>
                 <footer>
@@ -98,7 +98,7 @@
                         <field name="bank_account_no" required="1" />
                         <field name="payment_setting_id" required="1" options="{'no_create': True}"/>
                         <field name="payment_way_id" required="1" options="{'no_create': True}"/>
-                        <field name="refund_remark" required="1"/>
+                        <field name="refund_remark" />
                     </group>
                 </sheet>
                 <footer>
@@ -131,7 +131,7 @@
                 <field name="refund_type" optional="show" width="150px"/>
                 <field name="refund_apply_time" optional="show" width="150px"/>
                 <field name="wait_duration_tip" column_invisible="1"/>
-                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show" width="150px"/>
+                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show" width="150px" string="已处理时长"/>
                 <field name="refund_user_id" string="操作人" optional="show" width="150px"/>
             </tree>
         </field>
@@ -357,12 +357,34 @@
         </field>
     </record>
 
+    <!-- 退款凭证 -->
+    <record model="ir.ui.view" id="form_refund_voucher">
+        <field name="name">退款凭证</field>
+        <field name="model">refund.record</field>
+        <field name="arch" type="xml">
+            <form edit="0">
+                <sheet>
+                    <group>
+                        <field name="refund_amount" string="Amount"/>
+                        <field name="refund_voucher" string="Description"/>
+                        <field name="refund_complete_time" string="Time" readonly="1"/>
+                        <field name="loan_user_name" string="Name"/>
+                        <field name="bank_account_no" string="Account Number"/>
+                        <field name="payment_way_id" string="Method" options="{'no_open': 1}"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="下载凭证" type="object" name="action_download_voucher" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 
     <record model="ir.actions.act_window" id="act_refund_order">
         <field name="name">待退款订单</field>
         <field name="res_model">loan.order</field>
         <field name="view_mode">tree</field>
-        <field name="domain">[('order_status', '=', '8'), ('platform_profit', '>', 0)]</field>
+        <field name="domain">[('order_status', '=', '8'), ('platform_profit_amount', '>', 0)]</field>
         <field name="context">{
             'tree_view_ref': 'loan_financial.list_refund_order'
         }

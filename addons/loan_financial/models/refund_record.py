@@ -59,6 +59,7 @@ class RefundRecord(models.Model):
 
     wait_duration = fields.Char('未处理时长', compute='_compute_wait_duration')
     wait_duration_tip = fields.Boolean('是否高亮提示',compute='_compute_wait_duration')
+    refund_voucher = fields.Char('退款凭证描述', compute="_compute_refund_voucher")
 
     @api.depends('order_id')
     def _compute_from_order(self):
@@ -110,8 +111,17 @@ class RefundRecord(models.Model):
         for order in self:
             order.real_refund_amount = round(order.refund_amount + order.refund_fee + order.refund_tax, 2)
 
+    @api.depends()
+    def _compute_refund_voucher(self):
+        for order in self:
+            order.refund_voucher = "Refund"
+
     @api.onchange('loan_user_phone')
     def _onchange_loan_user_phone(self):
+        # 正常退款不需要查询用户信息
+        if self.refund_type == "1":
+            return 
+        
         if self.loan_user_phone:
             loan_user = self.env['loan.user'].search([('phone_no', '=', self.loan_user_phone)], limit=1)
             if not loan_user:
@@ -257,7 +267,6 @@ class RefundRecord(models.Model):
             })                    
         self.env['platform.flow'].create(flow_data)
 
-
     def after_payment(self, trade_record):
         """
         退款完成
@@ -299,6 +308,28 @@ class RefundRecord(models.Model):
         展示退款凭证
         """
         return {
+            'name': '退款凭证',
+            'type': 'ir.actions.act_window',
+            'res_model': self._name,
+            'view_mode': 'form',
+            'view_id': self.env.ref('loan_financial.form_refund_voucher').id,
+            'res_id': self.id,
+            'target': 'new',
+            'context': {
+                'dialog_size': self._action_default_size()
+            }
+        }
+    
+    def action_download_voucher(self):
+        """
+        下载退款凭证
+        """
+        form_view_id = self.env.ref('loan_financial.form_refund_voucher')
+        url = f"/download_order_refund_voucher?res_id={self.id}&res_model={self._name}&view_id={form_view_id.id}"
+        return {
+            'type': 'ir.actions.act_url',
+            'url': url,
+            'target': 'new',
         }
     
     def action_refund_again(self):

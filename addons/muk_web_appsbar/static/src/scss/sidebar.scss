@@ -105,6 +105,9 @@
 .sidebar_menu li a {
   color: #ffffff;
 }
+.sidebar_menu a {
+  color: #ffffff;
+}
 //
 .sidebar_menu .appsbar_menu_size {
   color: #ffffff;
@@ -126,9 +129,9 @@
   font-size: 12px;
 }
 
-.sidebar_nav .sidebar_menu a.nav-link {
-  padding-left: 2rem
-}
+// .sidebar_nav .sidebar_menu a.nav-link {
+//   padding-left: 2rem
+// }
 
 .sidebar_nav .sidebar_menu a.nav-link.active {
   color: #0c66e4 !important;

@@ -110,7 +110,6 @@ msgstr "角色"
 
 
 #. module: loan_settings
-#: model:ir.ui.menu,name:loan_settings.loan_settings_role_menu
 #: model:ir.model.fields,field_description:loan_settings.field_loan_settings_user__is_collection
 msgid "Is Collection"
 msgstr "是否为催收员"

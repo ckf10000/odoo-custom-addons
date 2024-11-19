@@ -18,7 +18,7 @@ class RepayOrder(models.Model):
     pay_complete_time = fields.Datetime(string='放款成功时间', related="order_id.pay_complete_time")
     withdraw_time = fields.Datetime(string='取现时间', related="order_id.withdraw_time")
 
-    repay_type = fields.Selection(selection=enums.REPAY_TYPE, string='还款类型')
+    repay_type = fields.Selection(selection=enums.REPAY_ORDER_TYPE, string='还款类型')
     repay_status = fields.Selection(selection=enums.REPAY_STATUS, default='0', string='还款状态', index=True)
     repay_time = fields.Datetime(string='还款成功时间')
 
@@ -94,11 +94,10 @@ class RepayOrder(models.Model):
             rec.is_overdue = rec.order_id.is_overdue
 
     def _search_is_overdue(self, operator, value):
-        dt = fields.Datetime.now() - datetime.timedelta(days=6)
         if value:
-            domain = [('order_id.pay_complete_time', '<', dt)]
+            domain = [('order_id.is_overdue', '=', True)]
         else:
-            domain = [('order_id.pay_complete_time', '>=', dt )]
+            domain = [('order_id.is_overdue', '=', False )]
         return domain
     
     def _set_is_overdue(self):

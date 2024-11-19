@@ -19,6 +19,7 @@ class LoanSettingUsers(models.Model):
     _table = 'R_user'
     _inherit = 'loan.basic.model'
     _rec_name = 'name'
+    _order = 'write_date desc'
 
     sequence = fields.Char(string=_('UserID'), index=True, required=True)
     is_collection = fields.Boolean(string=_('是否为催收员'), default=False)
@@ -62,14 +63,25 @@ class LoanSettingUsers(models.Model):
         partner_kwargs = ModelKwargsConverter.get_res_partner_kwargs(vals=vals)
         partner_kwargs.update(dict(company_id=res_company_id))
         partner = self.env['res.partner'].sudo().create(partner_kwargs)
-        add_group_ids, _ = ModelKwargsConverter.parse_many2many_args(*vals.get('role_ids'))
+        if vals.get('role_ids'):
+            add_group_ids, _ = ModelKwargsConverter.parse_many2many_args(*vals.get('role_ids'))
+        else:
+            add_group_ids = list()
+        if vals.get('subordinates_ids'):
+            add_subordinates_ids, _ = ModelKwargsConverter.parse_many2many_args(*vals.get('subordinates_ids'))
+            loan_settings_user = self.env['loan.settings.user'].browse(add_subordinates_ids)
+            sub_user_ids = [x.res_user_id.id for x in loan_settings_user]
+        else:
+            sub_user_ids = list()
         role_ids = self.env['loan.settings.role'].sudo().browse(add_group_ids)
         raw_role_ids = [role_id.res_groups_id.id for role_id in role_ids]
         res_users = self.env['res.users'].sudo().create(
             {
                 'company_id': res_company_id,
+                'department_id': hr_depart_id,
                 'partner_id': partner.id,
                 'login': vals.get('login'),
+                'is_collection': vals.get('is_collection'),
                 'dialog_size': 'minimize',
                 'notification_type': 'email',
                 'sidebar_type': 'large',
@@ -77,7 +89,13 @@ class LoanSettingUsers(models.Model):
                 'company_ids': [(4, res_company_id)]
             }
         )
+        user_id = res_users.id
+        if sub_user_ids:
+            self.env['res.users'].browse(sub_user_ids).sudo().write({
+                "parent_id": user_id
+            })
         self.env['res.users'].browse(res_users.id)._change_password(vals.get('password'))
+
         self.env['res.groups'].browse(raw_role_ids).write(
             {
                 "users": [(4, res_users.id)]
@@ -97,20 +115,20 @@ class LoanSettingUsers(models.Model):
         vals['hr_depart_id'] = hr_depart_id
         vals['res_partner_id'] = partner.id
         vals['company_id'] = vals['res_company_id'] = res_company_id
-        record = super(LoanSettingUsers, self).create(vals)
-        self.env['collection.points'].sudo().create({
-            'sequence': self.env['ir.sequence'].next_by_code('collection.points'),
-            'user_id': record.id,
-            'group_id': self.env.ref('loan_collection.loan_collector_group').id,
-            'collection_stage_id': False,
-            'department_id': hr_depart_id,
-            'is_input': False,
-            'loan_product_ids': self.env['loan.product'].sudo().search([]).ids,
-            'is_input_select': 'stop',
-            'active': record.has_group('loan_collection.loan_collector_group')
-        })
-        record.sudo().write({'is_collection': record.has_group('loan_collection.loan_collector_group')})
-        return super(LoanSettingUsers, self).create(vals)
+        res = super(LoanSettingUsers, self).create(vals)
+        self.env.cr.commit()
+        res_users = self.env['res.users'].search([('id', '=', user_id)], limit=1)
+        if res_users:
+            # 更新 collection.points 记录
+            if res_users.has_group('loan_collection.loan_collector_group'):
+                is_collection = 't'
+                collection_sql = f'update "C_points" set department_id={hr_depart_id},active=\'t\' where user_id={user_id}'
+                self.env.cr.execute(collection_sql)
+            else:
+                is_collection = 'f'
+            users_sql = f'update "res_users" set is_collection=\'{is_collection}\' where id={user_id}'
+            self.env.cr.execute(users_sql)
+        return res
 
     def write(self, vals):
         if 'active' in vals and vals['active'] is False:
@@ -120,6 +138,9 @@ class LoanSettingUsers(models.Model):
             self.env.cr.execute(
                 "update res_users set active='f' where id=%s", (self.res_user_id.id,)
             )
+            self.env.cr.execute(
+                'update "C_points" set active=\'f\' where id=%s', (self.res_user_id.id,)
+            )
             return super(LoanSettingUsers, self).write({'active': False})
         elif 'active' in vals and vals['active'] is True:
             self.env.cr.execute(
@@ -128,8 +149,30 @@ class LoanSettingUsers(models.Model):
             self.env.cr.execute(
                 "update res_users set active='t' where id=%s", (self.res_user_id.id,)
             )
+            self.env.cr.execute(
+                'update "C_points" set active=\'t\' where id=%s', (self.res_user_id.id,)
+            )
             return super(LoanSettingUsers, self).write({'active': True})
         else:
+            points_update = list()
+            users_update = list()
+            user_id = self.res_user_id.id
+            if vals.get('subordinates_ids'):
+                add_subordinates_ids, del_subordinates_ids = ModelKwargsConverter.parse_many2many_args(
+                    *vals.get('subordinates_ids')
+                )
+                if add_subordinates_ids:
+                    loan_settings_user_1 = self.env['loan.settings.user'].browse(add_subordinates_ids)
+                    add_sub_user_ids = [x.res_user_id.id for x in loan_settings_user_1]
+                else:
+                    add_sub_user_ids = list()
+                if del_subordinates_ids:
+                    loan_settings_user_2 = self.env['loan.settings.user'].browse(del_subordinates_ids)
+                    del_sub_user_ids = [x.res_user_id.id for x in loan_settings_user_2]
+                else:
+                    del_sub_user_ids = list()
+            else:
+                add_sub_user_ids = del_sub_user_ids = list()
             if "merchant_id" in vals:
                 res_company_id = self.env['loan.settings.merchant'].browse([vals.get("merchant_id")]).company_id.id
                 vals['company_id'] = vals['res_company_id'] = res_company_id
@@ -143,8 +186,12 @@ class LoanSettingUsers(models.Model):
                         'company_ids': [(4, res_company_id)]
                     }
                 )
+                points_update.append(f"company_id={res_company_id}")
+                users_update.append(f"company_id={res_company_id}")
             if "team_id" in vals:
-                vals['hr_depart_id'] = self.env['loan.settings.team'].browse([vals.get("team_id")]).hr_depart_id.id
+                vals['hr_depart_id'] = hr_depart_id = self.env['loan.settings.team'].browse(
+                    [vals.get("team_id")]).hr_depart_id.id
+                points_update.append(f"department_id={hr_depart_id}")
             if vals.get('name'):
                 vals['complete_name'] = vals.get('name')
             role_ids = vals.get('role_ids', list()) or list()
@@ -168,26 +215,31 @@ class LoanSettingUsers(models.Model):
                         "users": [(3, self.res_user_id.id)]
                     }
                 )
-            result = super(LoanSettingUsers, self).write(vals)
-            for record in self:
-                # 检查用户是否是催收员，并确保在正确的上下文中使用
-                if record.has_group('loan_collection.loan_collector_group'):
-                    is_collection_collector = True
-
-                    # 使用 sudo 来确保我们具备足够的权限去访问其他模型
-                    points_ids = record.env['collection.points'].sudo().search([('user_id', '=', record.res_user_id)])
-
-                    # 更新分单管理的活动状态
-                    for points_id in points_ids:
-                        points_id.active = is_collection_collector
-            # 调用父类的 write 方法，确保数据的正常更新
-            return result
-
-    # def unlink(self):
-    #     self.env['res.partner'].sudo().search([('id', 'in', self.res_partner_id.id)]).unlink()
-    #     删除对应用户分单管理
-    # self.env['collection.points'].sudo().search([('user_id', 'in', self.ids)]).unlink()
-    # return super(LoanSettingUsers, self).unlink()
+            if add_sub_user_ids:
+                self.env['res.users'].browse(add_sub_user_ids).sudo().write({
+                    "parent_id": user_id
+                })
+            if del_sub_user_ids:
+                self.env['res.users'].browse(del_sub_user_ids).sudo().write({
+                    "parent_id": None
+                })
+            res = super(LoanSettingUsers, self).write(vals)
+            self.env.cr.commit()
+            res_users = self.env['res.users'].search([('id', '=', user_id)], limit=1)
+            if res_users.has_group('loan_collection.loan_collector_group'):
+                points_update.append(f"active='t'")
+                users_update.append(f"is_collection='t'")
+            else:
+                points_update.append(f"active='f'")
+                users_update.append(f"is_collection='f'")
+            if users_update:
+                sql = f"update res_users set {','.join(users_update)} where id={user_id}"
+                self.env.cr.execute(sql)
+            if points_update:
+                con = ','.join(points_update)
+                sql = f'update "C_points" set {con} where user_id={user_id}'
+                self.env.cr.execute(sql)
+            return res
 
     @api.depends('create_date')
     def _compute_formatted_create_date(self):

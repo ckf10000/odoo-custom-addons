@@ -46,7 +46,7 @@
                 <field name="approval_user_id" optional="show" width="150px"/>
                 <field name="platform_order_no" optional="show" width="150px"/>
                 <field name="apply_user_id" optional="show" width="150px"/>
-                <field name="close_reason_id" optional="show" width="150px"/>
+                <field name="close_reason" optional="show" width="150px"/>
                 
                 <button name="action_show_additional_record" type="object" string="补单" invisible="status in ['2', '3']"/>
                 <button name="action_show_update_payment_setting" type="object" string="通过" invisible="status != '1'"/>
@@ -100,13 +100,39 @@
                     <group>
                         <field name="addition_type" readonly="1"/>
                         <field name="amount" readonly="1"/>
-                        <field name="close_reason_id" required="1" widget="radio"/>
+                        <field name="close_reason" invisible="1"/>
+                        <field name="close_reason_id" required="1" options="{'no_create_edit': true, 'no_open': false, 'quick_create': false }"/>
                     </group>
                     <footer>
                         <button string="取消" class="btn btn-default" special="cancel"/>
                         <button string="确定" name="action_close_record" type="object" class="oe_highlight"/>
                     </footer>
                 </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="list_additional_record_close_reason">
+        <field name="name">关单原因列表</field>
+        <field name="model">additional.record.close.reason</field>
+        <field name="arch" type="xml">
+            <tree import="0" export_xlsx="0"  editable="bottom" delete="1">
+                <field name="sequence" widget="handle"/>
+                <field name="text"/>
+                <button name="unlink" type="object" string="删除"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="form_additional_record_close_reason">
+        <field name="name">关单原因表单</field>
+        <field name="model">additional.record.close.reason</field>
+        <field name="arch" type="xml">
+            <form import="0" export_xlsx="0">
+                <group>
+                    <field name="text" nolabel="1" colspan="2"/>
+                </group>
+                
             </form>
         </field>
     </record>
@@ -122,6 +148,13 @@
         </field>
         <field name="search_view_id" ref="search_additional_record" />
     </record>
+<!-- 
+    <record model="ir.actions.act_window" id="act_additional_record_close_reason">
+        <field name="name">关单原因</field>
+        <field name="res_model">additional.record.close.reason</field>
+        <field name="view_mode">tree</field>
+        <field name="context"></field>
+    </record> -->
 
   </data>
 </odoo>

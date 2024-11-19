@@ -175,10 +175,11 @@ class PayOrder(models.Model):
             "account_management_fee": amount1,
             "platform_service_fee": amount1,
             "risk_fee": amount1,
-            "credit_fee": amount1
+            "credit_fee": amount1,
+            "trade_count": 1
         }
         pay_order = self.create(pay_order_data)
-        pay_order.order_id.write({
+        loan_order.write({
             "order_status": "5",
         })
         pay_order.call_pay_handler()
@@ -270,7 +271,8 @@ class PayOrder(models.Model):
         """
         self.write({
             'pay_status': "2",
-            'financial_time': fields.Datetime.now()
+            'financial_time': fields.Datetime.now(),
+            'trade_count': self.trade_count + 1
         })
 
         self.order_id.write({
@@ -393,19 +395,16 @@ class PayOrder(models.Model):
         trade_record = self.env['payment.setting.trade.record'].create(trade_data)
 
         # 更新订单信息
-        pay_order_data = {
-            'trade_count': self.trade_count + 1,
-        }
         if trade_status == "3":
-            pay_order_data.update({
+            pay_order_data={
                 'pay_status': '4',
                 'pay_complete_time': now,
                 "fail_reason": fail_reason
-            })
+            }
+            self.write(pay_order_data)
             self.order_id.write({
                 "order_status": "6"
             })
-        self.write(pay_order_data)
         return 
             
     def after_payment(self, trade_record):
@@ -431,6 +430,7 @@ class PayOrder(models.Model):
                 "order_status": "7",
                 "pay_complete_time": now,
                 "withdraw_time": self.withdraw_time,
+                "pay_platform_order_no": trade_record.platform_order_no
             })
             # 贷超订单
             self.order_id.update_bill_order({
@@ -443,43 +443,45 @@ class PayOrder(models.Model):
             self.order_id.update_bill_user_status(update_fields=["product_earliest_due_time", "fst_time_send_out"])
             
             # 生成待还订单
-            self.env['repay.order'].create({
-                "order_id": self.order_id.id,
-                "repay_type": "1",
-                "repay_status": "1"
-            })
+            repay_order = self.order_id.get_repay_order()
+            if not repay_order:
+                self.env['repay.order'].create({
+                    "order_id": self.order_id.id,
+                    "repay_type": "1",
+                    "repay_status": "1"
+                })
 
-            # 资金流水
-            base_data = {
-                "order_id": self.order_id.id,
-                "product_id": self.product_id.id,
-                "payment_setting_id": self.payment_setting_id.id,
-                "payment_way_id": self.payment_way_id.id,
-                "flow_time": now
-            }
-            flow_data = []
-            if self.pay_amount:
-                flow_data.append({
-                    "flow_type": enums.FLOW_TYPE[0][0],
-                    "flow_amount": self.pay_amount,
-                    "trade_type": enums.TRADE_TYPE[0][0],
-                    **base_data
-                })
-            if self.order_management_fee:
-                flow_data.append({
-                    **base_data,
-                    "flow_type": enums.FLOW_TYPE[1][0],
-                    "flow_amount": self.order_management_fee,
-                    "trade_type": enums.TRADE_TYPE[1][0],
-                })
-            if self.pay_fee:
-                flow_data.append({
-                    **base_data,
-                    "flow_type": enums.FLOW_TYPE[0][0],
-                    "flow_amount": self.pay_fee,
-                    "trade_type": enums.TRADE_TYPE[2][0],
-                })                      
-            self.env['platform.flow'].create(flow_data)
+                # 资金流水
+                base_data = {
+                    "order_id": self.order_id.id,
+                    "product_id": self.product_id.id,
+                    "payment_setting_id": self.payment_setting_id.id,
+                    "payment_way_id": self.payment_way_id.id,
+                    "flow_time": now
+                }
+                flow_data = []
+                if self.pay_amount:
+                    flow_data.append({
+                        "flow_type": enums.FLOW_TYPE[0][0],
+                        "flow_amount": self.pay_amount,
+                        "trade_type": enums.TRADE_TYPE[0][0],
+                        **base_data
+                    })
+                if self.order_management_fee:
+                    flow_data.append({
+                        **base_data,
+                        "flow_type": enums.FLOW_TYPE[1][0],
+                        "flow_amount": self.order_management_fee,
+                        "trade_type": enums.TRADE_TYPE[1][0],
+                    })
+                if self.pay_fee:
+                    flow_data.append({
+                        **base_data,
+                        "flow_type": enums.FLOW_TYPE[0][0],
+                        "flow_amount": self.pay_fee,
+                        "trade_type": enums.TRADE_TYPE[2][0],
+                    })                      
+                self.env['platform.flow'].create(flow_data)
 
         else:
             pay_order_data.update({

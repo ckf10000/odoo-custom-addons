@@ -63,9 +63,14 @@ REPAY_STATUS = [
     ('2', '还款成功')
 ]
 
-REPAY_TYPE = [
+REPAY_ORDER_TYPE = [
     ('1', '正常还款'),
     ('2', '展期还款')
+]
+
+REPAY_RECORD_TYPE = [
+    ('1', '正常收款'),
+    ('2', '展期收款')
 ]
 
 EXTENSION_STATUS = [

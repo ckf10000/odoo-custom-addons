@@ -35,6 +35,8 @@ export class BooleanSelectionField extends Component {
             return '1'
         }else if(record_vlaue === false){
             return '0'
+        }else{
+            return ''
         }
         return record_vlaue
     }

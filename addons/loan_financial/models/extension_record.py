@@ -1,8 +1,9 @@
 import logging
-import datetime
+import datetime, pytz
 from typing import Dict, List
 from odoo import models, fields, api, exceptions
 from . import enums
+from ..utils import pay_utils
 
 
 _logger = logging.getLogger(__name__)
@@ -259,6 +260,62 @@ class ExtensionRecord(models.Model):
         })
         
         self.update_extension_status(now)
+
+    def get_pay_link(self, device='pc'):
+        """
+        获取支付链接
+        """
+        # 创建交易记录
+        payment_channel = self.order_id.repayment_setting_id.payment_channel_id
+        trade_no = self.env['ir.sequence'].sudo().next_by_code('trade_record_no_seq')
+        if payment_channel.enum_code == 2:
+            data = {
+                'mchId': int(payment_channel.merchant_no),
+                'key': payment_channel.merchant_key,
+                'mchOrderNo': trade_no,
+                'orderAmount': int(self.pending_amount * 100),
+                'notifyUrl': payment_channel.call_back_url or "",
+                'returnUrl': payment_channel.redirect_url or "",
+                'device': device,
+                'uid': self.order_id.loan_uid,
+                'customerName': self.order_id.loan_user_name,
+                'tel': self.order_id.loan_user_phone
+            }
+            res = pay_utils.coin_pay.create_pay_order(data)
+            pay_url = res.get('data', {}).get('payUrl')
+            platform_order_no = res.get('data', {}).get('payOrderId')
+        else:
+            data = {
+                'merchantNo': payment_channel.merchant_no,
+                'key': payment_channel.merchant_key,
+                'orderNo': trade_no,
+                'amount': str(self.pending_amount),
+                'notifyUrl': payment_channel.call_back_url or "",
+                'userName': self.order_id.loan_user_name,
+                'timestamp': datetime.datetime.now().astimezone(tz=pytz.timezone( 'Asia/Kolkata' )).strftime('%Y-%m-%d %H:%M:%S'),
+            } 
+            res = pay_utils.sf_pay.create_pay_order(data)
+            pay_url = res.get('url', "")
+            platform_order_no = res.get('data', {}).get('platformOrderNo', "")
+
+        # 创建交易记录
+        trade_data = {
+            'order_id': self.order_id.id,
+            'payment_setting_id': self.order_id.repayment_setting_id.id,
+            'payment_way_id': self.order_id.repayment_way_id.id,
+            'trade_amount': self.pending_amount,
+            'trade_no': trade_no,
+            'trade_status': '1' if res.get('code', 999) == 200 else '3',
+            'trade_type': '1',
+            'trade_start_time': fields.Datetime.now(),
+            'platform_order_no': platform_order_no,
+            'trade_data': res,
+            'res_model': 'extension.record',
+            'res_id': self.id
+        }
+        self.env['payment.setting.trade.record'].sudo().create(trade_data)
+
+        return pay_url
 
     def action_show_settle_wizard(self):
         return {

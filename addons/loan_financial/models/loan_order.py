@@ -29,8 +29,8 @@ class LoanOrder(models.Model):
 
     repay_complete_time = fields.Datetime('还款完成时间')
     repay_date = fields.Date('应还日期', compute='_compute_repay_date')
-    overdue_days = fields.Integer('逾期天数', compute='_compute_overdue_days', compute_sudo=True)
-    is_overdue = fields.Boolean('是否逾期', compute='_compute_overdue_days', compute_sudo=True)
+    overdue_days = fields.Integer('逾期天数')
+    is_overdue = fields.Boolean('是否逾期')
     overdue_rate = fields.Float('逾期罚息费率', related='product_id.penalty_interest_rate')
     overdue_fee = fields.Float('罚息', compute='_compute_overdue_fee')
     late_fee = fields.Float('滞纳金', compute='_compute_late_fee')
@@ -51,7 +51,8 @@ class LoanOrder(models.Model):
     repayd_principal = fields.Float('已还本金', compute='_compute_repayed_amount')
     repayed_overdue_fee = fields.Float('已还罚息', compute='_compute_repayed_amount')
     repayed_late_fee = fields.Float('已还滞纳金', compute='_compute_repayed_amount')
-    platform_profit = fields.Float('平台额外收益', compute='_compute_platform_profit', store=True)
+    platform_profit = fields.Float('平台额外收益', compute='_compute_platform_profit')
+    platform_profit_amount = fields.Float('平台利润金额', compute='_compute_platform_profit_amount', store=True)
     
     repay_platform_order_no = fields.Char(string='还款序列号', compute='_compute_repayed_amount')
 
@@ -103,7 +104,7 @@ class LoanOrder(models.Model):
                 else:
                     order.wait_duration_tip = False
 
-    @api.depends('order_status', 'pay_complete_time')
+    @api.depends('order_status', 'pay_complete_time', 'is_extension')
     def _compute_repay_date(self):
         """
         应还日期计算规则：
@@ -119,20 +120,6 @@ class LoanOrder(models.Model):
             else:
                 start_time = order.apply_time
             order.repay_date = (start_time + datetime.timedelta(days=order.loan_period-1)).date()
-
-    @api.depends()
-    def _compute_overdue_days(self):
-        """
-        逾期天数 = 当前日期 - 应还日期
-        """
-        now = datetime.date.today()
-        for order in self:
-            if order.order_status == "7" and now > order.repay_date:
-                order.overdue_days = (now - order.repay_date).days
-                order.is_overdue = True
-            else:
-                order.overdue_days = 0
-                order.is_overdue = False
 
     @api.depends('overdue_days')
     def _compute_overdue_fee(self):
@@ -240,6 +227,11 @@ class LoanOrder(models.Model):
         for order in self:
             platform_profit = round(order.repayed_amount-order.repay_amount+order.derate_amount+order.settle_amount-order.refund_amount, 2)
             order.platform_profit = platform_profit if platform_profit > 0 else 0
+
+    @api.depends('platform_profit')
+    def _compute_platform_profit_amount(self):
+        for rec in self:
+            rec.platform_profit_amount = rec.platform_profit
     
     @api.depends('derate_record_ids.is_effective')
     def _compute_derate_amount(self):
@@ -267,21 +259,39 @@ class LoanOrder(models.Model):
         """
         for order in self:
             order.refund_amount = round(sum([record.refund_amount for record in order.refund_record_ids if record.status=="3"]), 2)
-    
+
     @api.model
     def task_compute_overdue(self):
         """
         计算订单是否已经逾期
         """
+        now = datetime.date.today()
         for order in self.search([('order_status', '=', '7')]):
+            if now > order.repay_date:
+                order.overdue_days = (now - order.repay_date).days
+                order.is_overdue = True
+            else:
+                order.overdue_days = 0
+                order.is_overdue = False
+
+            if order.repay_date == now:
+                order.update_bill_user_status()
+
             if not order.is_overdue:
                 continue
+
             order.update_bill_order({
                 "overdue_flag": True,
                 "pending_amount": order.pending_amount,
                 "late_fee": order.late_fee
             })
-            order.update_bill_user_status()
+
+    def _search_platform_profit(self, operator, value):
+        if value:
+            domain = [('is_overdue', '=', True)]
+        else:
+            domain = [('is_overdue', '=', False )]
+        return domain
 
     def update_bill_user_status(self, update_fields=["product_earliest_due_time", "fst_time_send_out", "did_repay_flag"]):
         """
@@ -307,6 +317,7 @@ class LoanOrder(models.Model):
         """
         更新订单状态
         """
+        self = self.browse(self.id)
         if not self.pending_amount:
             self.write({
                 'order_status': '8',
@@ -451,14 +462,13 @@ class LoanOrder(models.Model):
             "repay_time":extension_success_time
         })
         
-    def action_show_par_status_1_list(self):
+    def action_show_pay_status_1_list(self):
 
         context = {
             'is_auto_pay': self.env["loan.order.settings"].get_param('is_auto_pay', False)
         }
-        _logger.info("context: %s" % context)
         return {
-            "name": '待还款订单',
+            "name": '待放款订单',
             "type": "ir.actions.act_window",
             "res_model": self._name,
             "view_mode": "tree",
@@ -474,11 +484,16 @@ class LoanOrder(models.Model):
         财务订单配置
         """
         settings = self.env["loan.order.settings"]
-        is_auto_pay = settings.get_param('is_auto_pay', '0')
-        is_auto_pay = "0" if is_auto_pay == "1" else "1"
+        is_auto_pay = settings.get_param('is_auto_pay', False)
+        is_auto_pay = not is_auto_pay
         settings.set_param('is_auto_pay', is_auto_pay)
 
-        return self.action_show_par_status_1_list()
+        # 处理当前未审核的订单
+        if is_auto_pay:
+            for order in self.search([('order_status', '=', '3')]):
+                self.env['pay.order'].approval_pass(order, "自动放款", is_auto=True)
+
+        return self.action_show_pay_status_1_list()
         
     def action_show_pay_order_wizard(self):
         """
@@ -561,8 +576,7 @@ class LoanOrder(models.Model):
         """
         if self.derate_record_ids.filtered(lambda x: x.fin_approval_status == '1'):
             raise exceptions.UserError('当前订单存在待审核的金额减免申请，审核完成后才可重新申请！')
-        
-        repay_order = self.get_repay_order()
+
         return {
             'name': '金额减免申请',
             'type': 'ir.actions.act_window',
@@ -572,10 +586,10 @@ class LoanOrder(models.Model):
             'context': {
                 'dialog_size': self._action_default_size(), 
                 'default_order_id': self.id,
-                'default_repay_order_id': repay_order.id,
                 "default_order_pending_amount": self.pending_amount,
                 'default_max_derate_amount': self.can_derate_amount,
-                'default_derate_type': "2"
+                'default_derate_type': "2",
+                'default_fin_approval_status': "1",
             }
         }
 
@@ -657,7 +671,7 @@ class LoanOrder(models.Model):
         else: # 挂账金额
             total_amount = self.pending_amount
         
-        extension_amount = round(total_amount * self.product_id.defer_interest_rate, 2)
+        extension_amount = round(total_amount * self.product_id.defer_interest_rate)
         return extension_amount
     
     def action_show_extension_wizard(self):

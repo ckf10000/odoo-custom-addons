@@ -41,8 +41,8 @@ MenuDropdown.props.xmlid = {
     optional: true,
 };
 
-$(document).on("click", ".menu_set a", function (event) {
-    var menu = $(".menu_set a");
+$(document).on("click", ".sidebar_menu a", function (event) {
+    var menu = $(".sidebar_menu a");
     var $this = $(this);
     // var id = $this.data("id");
     // $("header").removeClass().addClass(id);
@@ -50,6 +50,7 @@ $(document).on("click", ".menu_set a", function (event) {
     if ($this.next().length === 1) {
     }
     menu.removeClass("active");
+    console.log(this)
     $this.addClass("active");
 });
 

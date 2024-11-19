@@ -126,7 +126,10 @@ patch(SearchBar.prototype, {
                 search_date[element.fieldName] = [false, false];
             }else if(element.fieldType === "boolean"){
                 element.fieldInfo = this.fieldInfo[`${element.fieldName}_0`];
-                // record_data[element.fieldName] = '';
+                if (element.fieldInfo.widget === "boolean_selection"){
+                    record_data[element.fieldName] = '';
+                }
+                
             }
             if (element.fieldType === "many2one"){
                 search_fields[element.fieldName] = {fields: {display_name: {}}};
@@ -157,7 +160,7 @@ patch(SearchBar.prototype, {
             resIds: [],
             resModel: this.env.searchModel.resModel,
         }
-        
+
         this.env.searchModel.query.forEach(el => {
             const searchItem = this.env.searchModel.searchItems[el.searchItemId];
             if (!searchItem || !searchItem.fieldName) return
@@ -174,7 +177,7 @@ patch(SearchBar.prototype, {
                 search_date[searchItem.fieldName] = deserializeDomain(searchItem.domain, searchItem.fieldType);
             }
         })
-
+        
         this.record = new Record(model, config, record_data, {})
         this.record.search_date = search_date;
 
@@ -205,7 +208,7 @@ patch(SearchBar.prototype, {
                 }
             }
             if(Object.values(data).length == 0)return;
-            this.record._setData(data);
+            // this.record._setData(data);
             // this.env.searchModel.search();
             document.querySelector(".search_btn").click();
         })

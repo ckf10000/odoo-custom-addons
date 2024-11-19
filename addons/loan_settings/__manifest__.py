@@ -23,6 +23,7 @@ Loan Settings System
     'i18n': [
         'i18n/zh_CN.po'
     ],
+    'post_load': 'post_load',
     'application': True,
     'auto_install': False,
     'installable': True,

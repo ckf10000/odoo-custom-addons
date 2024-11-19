@@ -6,6 +6,10 @@
         <field name="model">derate.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0">
+                <header>
+                    <button name="action_fin_derate_batch_approval" type="object" string="批量审核" class="oe_highlight" display="always"/>
+                    <button name="action_fin_derate_setting" type="object" string="自动审核配置"  display="always"/>
+                </header>
                 <field name="derate_no" optional="show" width="150px"/>
                 <field name="order_id" optional="show" width="150px"/>
                 <field name="loan_uid" optional="show" width="150px"/>
@@ -20,8 +24,8 @@
                 <field name="apply_reason" optional="hide" width="150px"/>
                 <field name="valid_time" string='有效期' optional="show" width="150px"/>
                 <field name="col_approval_time" optional="show" width="150px"/>
-                <button name="action_show_approval_wizard" type="object" string="通过" context="{'flag': 1}"/>
-                <button name="action_show_approval_wizard" type="object" string="拒绝" context="{'flag': 0}"/>
+                <button name="action_show_fin_approval" type="object" string="通过" context="{'flag': 1}"/>
+                <button name="action_show_fin_approval" type="object" string="拒绝" context="{'flag': 0}"/>
             </tree>
         </field>
     </record>
@@ -94,6 +98,7 @@
             <form>
                 <sheet>
                     <field name="order_id" invisible="1"/>
+                    <field name="fin_approval_status" invisible="1"/>
                     <group>
                         <field name="order_no" />
                         <field name="loan_user_name" />
@@ -107,30 +112,71 @@
                 </sheet>
                 <footer>
                     <button string="取消" class="btn btn-default" special="cancel"/>
-                    <button string="提交" special="save" class="oe_highlight"/>
+                    <button string="提交" type="object" name="action_fin_create" class="oe_highlight"/>
                 </footer>
             </form>
         </field>
     </record>
 
     <!-- wizard -->
-    <record model="ir.ui.view" id="wizard_derate_approval">
-        <field name="name">减免记录审核向导</field>
+    <record model="ir.ui.view" id="wizard_derate_setting">
+        <field name="name">减免记录配置向导</field>
+        <field name="model">derate.record.setting.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="auto_pass" widget="boolean_toggle"/>
+                        <field name="max_amount" invisible="not auto_pass" />
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="取消" class="btn btn-default" special="cancel"/>
+                    <button string="确认" type="object" name="action_setting" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="wizard_fin_derate_approval">
+        <field name="name">金额减免审核向导</field>
         <field name="model">derate.record.approval.wizard</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
                     <group>
-                        <field name="derate_id" invisible="1" force_save="1"/>
-                        <field name="stage" invisible="1" force_save="1"/>
-                        <field name="status" invisible="1" force_save="1"/>
+                        <field name="approval_type" invisible="1" />
+                        <field name="derate_id" invisible="1"/>
+                        <field name="approval_result" invisible="1" force_save="1"/>
                         <field name="desc" string="申请减免金额" readonly="1"/>
                         <field name="remark" />
                     </group>
                 </sheet>
                 <footer>
                     <button string="取消" class="btn btn-default" special="cancel"/>
-                    <button string="确认" special="save" class="oe_highlight"/>
+                    <button string="确认" type="object" name="action_approval" class="oe_highlight"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="wizard_fin_derate_batch_approval">
+        <field name="name">金额减免批量审核</field>
+        <field name="model">derate.record.batch.approval.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="approval_type" invisible="1"/>
+                        <field name="derate_record_ids" invisible="1" />
+                        <field name="desc" readonly="1" force_save="1"/>
+                        <field name="approval_result" widget="radio" options="{'horizontal': true}"/>
+                        <field name="remark"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="取消" class="btn btn-default" special="cancel"/>
+                    <button string="确认" type="object" name="action_approval" class="oe_highlight"/>
                 </footer>
             </form>
         </field>

@@ -42,6 +42,6 @@ class LoanOrderController(http.Controller):
         }
         order = request.env['loan.order'].sudo().create(order_data)
 
-        if is_auto_pay == "1":
+        if is_auto_pay:
             request.env['pay.order'].sudo().approval_pass(order, "自动放款", is_auto=True)
         return {"order_id": order.id}

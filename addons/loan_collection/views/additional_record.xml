@@ -1,0 +1,52 @@
+<odoo>
+  <data>
+    <!-- views -->
+    <record model="ir.ui.view" id="list_additional_record_col">
+        <field name="name">补单记录列表</field>
+        <field name="model">additional.record</field>
+        <field name="arch" type="xml">
+            <tree create='0' import="0" export_xlsx="0">
+                <field name="order_no" optional="show" width="150px"/>
+                <field name="order_user_id" optional="show" width="150px"/>
+                <field name="addition_type" optional="show" width="150px"/>
+                <field name="order_user_name" optional="show" width="150px"/>
+                <field name="order_user_phone" optional="show" width="150px"/>
+                <field name="apply_time" optional="show" string="补单时间" width="150px"/>
+                <field name="utr" optional="show" width="150px"/>
+                <field name="amount" optional="show" width="150px"/>
+                <field name="attachment_id" widget="btn_field" />
+                <field name="status" optional="show" width="150px"/>
+                <field name="approval_user_id" optional="show" width="150px"/>
+                <field name="apply_user_id" optional="show" width="150px"/>
+                <field name="close_reason" optional="show" width="150px"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="search_additional_record_col">
+        <field name="name">补单记录搜索</field>
+        <field name="model">additional.record</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_no"/>
+                <field name="order_user_id" />
+                <field name="order_user_phone"/>
+                <field name="status" />
+                <field name="addition_type" />
+            </search>
+        </field>
+    </record>
+    <!-- action views -->
+    <record model="ir.actions.act_window" id="act_additional_record_col">
+        <field name="name">补单审核</field>
+        <field name="res_model">additional.record</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{
+            'tree_view_ref': 'loan_collection.list_additional_record_col'
+        }
+        </field>
+        <field name="search_view_id" ref="search_additional_record_col" />
+    </record>
+
+  </data>
+</odoo>

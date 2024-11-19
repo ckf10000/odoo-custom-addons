@@ -54,7 +54,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="active"/>
+                <field name="active" widget="boolean_selection" options="{'selection':[['', ''], ['1', '已启用'], ['0', '已禁用']]}"/>
             </search>
         </field>
     </record>

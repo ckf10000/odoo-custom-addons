@@ -1,6 +1,66 @@
 <odoo>
     <data>
         <!-- views -->
+        <record model="ir.ui.view" id="list_collection_record">  
+            <field name="name">催收记录</field>  
+            <field name="model">history.collection.record</field>  
+            <field name="arch" type="xml">
+                <tree create="0" delete="0">
+                    <field name="collection_stage"/>
+                    <field name="overdue_days"/>
+                    <field name="user_id"/>
+                    <field name="relation_selection"/>
+                    <field name="phone_no"/>
+                    <field name="collection_type"/>
+                    <field name="contact_result"/>
+                    <field name="remark"/>
+                    <field name="file_ids" widget="btn_field"/>
+                    <field name="create_date" string="跟进时间"/>
+                    <field name="collector_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="history_collection_record_form">  
+            <field name="name">催收记录</field>  
+            <field name="model">history.collection.record</field>  
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="id" invisible="1" />
+                                <field name="collection_order_id" string="催收订单" invisible="1" />
+                                <field name="sequence" string="序号" />  
+                                <field name="collection_stage" string="催收阶段"/>
+                                <field name="overdue_days" string="逾期天数"/> 
+                                <field name="user_id" string="催收对象" />  
+                                <field name="relation_selection" string="与本人关系"/>  
+                                <field name="phone_no" string="跟踪电话"/>
+                                <field name="file_ids" string="附件图片" widget="many2many_binary"/>  
+                            </group>
+                            <group>
+                                <field name="collection_type" string="催收形式"/>  
+                                <field name="contact_result" string="联络结果"/>  
+                                <field name="create_date" string="跟进时间"/>  
+                                <field name="collector_id" string="催收员"/>   
+                                <field name="remark" string="备注"/> 
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+
+        <record id="act_history_collection_record" model="ir.actions.act_window">
+            <field name="name">催收记录</field>
+            <field name="res_model">history.collection.record</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context">{'default_res_model': 'collection.order'}</field>
+        </record>
+                
         <record model="ir.ui.view" id="collection_order_allot_list">
             <field name="name">待分配订单</field>
             <field name="model">collection.order</field>
@@ -22,7 +82,7 @@
                     <field name="pending_amount" string="挂账金额" optional="show"/>
                     <field name="overdue_days" string="逾期天数" optional="show"/>
                     <field name="collection_stage" string="催收阶段" optional="show"/>
-                    <field name="product_name" string="产品名称" optional="show"/>
+                    <field name="product_id" string="产品名称" optional="show"/>
                     <field name="app_name" string="APP名称" optional="show"/>
                     <field name="version" string="版本号" optional="show"/>
                     <button name="action_look_over" type="object" string="查看"/>
@@ -56,7 +116,7 @@
                                     <field name="overdue_fee" string="应还罚息" optional="show" readonly="1"/>  
                                     <field name="derate_amount" string="减免金额" optional="show" readonly="1"/>  
                                     <field name="apply_time" string="展期申请时间" optional="show" readonly="1"/>  
-                                    <field name="product_name" string="产品名称" optional="show" readonly="1" />  
+                                    <field name="product_id" string="产品名称" optional="show" readonly="1" />  
                                 </group>  
                                 <group colspan="1">  
                                     <field name="borrow_money_date" string="借款期限" optional="show" readonly="1"/>  
@@ -91,16 +151,17 @@
                             </group>  
                             <group col="5" string="活体&amp;证照信息" name="body_info" >
                                 <group colspan="1">
-                                    <field name="pan_front_img" string="PAN卡正面照" widget="image" optional="show" readonly="1"/>
+                                    <!-- <field name="pan_front_img" string="PAN卡正面照" optional="hide" readonly="1"/> -->
+                                    <field name="pan_front_img" string="PAN卡正面照" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                                 <group colspan="1">
-                                    <field name="pan_back_img" string="PAN卡背面照" widget="image" optional="show" readonly="1"/>
+                                    <field name="pan_back_img" string="PAN卡背面照" widget="image" options='{"zoom":true}'  readonly="1"/>                                 
                                 </group>
                                 <group colspan="1">
-                                    <field name="id_front_img" string="ID卡正面照" widget="image" optional="show" readonly="1"/>
+                                    <field name="id_front_img" string="ID卡正面照" widget="image" options='{"zoom":true}' readonly="1"/>                                 
                                 </group>
                                 <group colspan="1">
-                                    <field name="id_hand_img" string="ID卡手持照" widget="image" optional="show" readonly="1"/>
+                                    <field name="id_hand_img" string="ID卡手持照" widget="image" options='{"zoom":true}' readonly="1"/>                                 
                                 </group>
                                 <group colspan="1">
                                         <field name="body_discern_img" string="活体识别照" widget="image" optional="show" readonly="1"/>
@@ -110,16 +171,17 @@
                                 <page string="联系人信息">  
                                     <group name="user_info">
                                         <!--<button class="btn-primary" name="action_add_contact" type="object" string="补充联系人" display="always"/>-->
-                                        <field name="collection_user_contact_ids" string="联系人信息" edit="1" create="1" delete="1" nolabel="1" colspan="2"> 
-                                            <tree editable="bottom">
-                                                <field name="sequence" string="序号"/>
-                                                <field name="name" string="联系人姓名" required="1"/>
-                                                <field name="relation_selection" string="关系" required="1"/>
-                                                <field name="phone_no" string="电话" required="1"/>
-                                                <field name="write_date" string="补充时间" readonly="1"/>
-                                                <field name="write_uid" string="操作人" readonly="1"/>
-                                                <!-- <button name="action_edit" type="object" string="编辑"/>
-                                                <button name="unlink" type="object" string="删除"/> -->
+                                        <field name="collection_user_contact_ids" string="联系人信息" edit="1" create="1" delete="0" nolabel="1" colspan="2"> 
+                                            <tree editable="bottom" delete="0">
+                                                <field name="can_edit" invisible="1"/>
+                                                <field name="sequence" string="序号" widget="handle" readonly="not can_edit" width="50px"/>
+                                                <field name="name" string="联系人姓名" required="1" readonly="not can_edit"/>
+                                                <field name="relation_selection" string="关系" required="1" readonly="not can_edit"/>
+                                                <field name="phone_no" string="电话" required="1" readonly="not can_edit"/>
+                                                <field name="add_date" string="补充时间" readonly="1"/>
+                                                <field name="add_user_id" string="操作人" readonly="1"/>
+                                                <!-- <button name="action_edit" type="object" string="编辑"/> -->
+                                                <button name="unlink" type="object" icon="fa-trash-o" title="删除" invisible="not can_edit"/>
                                             </tree>
                                         </field>
                                     </group>
@@ -135,8 +197,6 @@
                                         </tree>  
                                     </field>  
                                 </page>  
-                            </notebook>    
-                            <notebook >     
                                 <page string="通话记录">  
                                     <field name="user_call_record_ids" readonly="1">  
                                         <tree>  
@@ -149,64 +209,16 @@
                                             <field name="total_call_duration" string="通话总时长(m)"/>  
                                         </tree>  
                                     </field>  
-                                </page>  
-                            </notebook> 
-                            <!-- <notebook>
-                                <page string="历史催收记录" >
-                                    <field name="id" invisible="1"/>
-                                    <button string="添加" icon="fa-plus" type="action" name="%(loan_collection.act_history_collection_record)d" context="{'default_collection_order_id': active_id, 'default_user_id': user_id}"/>
-                                    <field name="history_collection_record_ids" mode="kanban">
-                                        <kanban create="0" edit="1">
-                                            <field name="id" />
-                                            <field name="sequence" string="序号"/>  
-                                            <field name="user_id" string="催收对象"/>  
-                                            <field name="relation_selection" string="与本人关系"/>  
-                                            <field name="phone_no" string="跟踪电话"/>  
-                                            <field name="collection_type" string="催收形式"/>  
-                                            <field name="contact_result" string="联络结果"/>  
-                                            <field name="remark" string="备注"/>  
-                                            <field name="file_ids" string="附件图片" widget="many2many_binary"/>  
-                                            <field name="create_date" string="跟进时间"/>  
-                                            <field name="collector_id" string="催收员"/> 
-                                            <templates>
-                                                <t t-name="kanban-box">
-                                                    <div>
-                                                        <div class="o_dropdown_kanban dropdown">
-                                                            <a class="dropdown-toggle o-no-caret btn" role="button" data-toggle="dropdown" data-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
-                                                                <span class="fa fa-ellipsis-v"/>
-                                                            </a>
-                                                            <div class="dropdown-menu" role="menu">
-                                                                <a role="menuitem" type="delete" class="dropdown-item">删除</a>
-                                                            </div>
-                                                        </div>
-                                                        <div class="oe_kanban_content">
-                                                            <div class="o_kanban_image">
-                                                                <img t-att-src="kanban_image('res.users', 'avatar_128', record.user_id.raw_value)" alt=""/>
-                                                            </div>
-                                                            <div class="oe_kanban_details">
-                                                                <strong class="o_kanban_record_title oe_partner_heading"><field name="collection_type"/></strong>
-                                                                <ul>
-                                                                    <li><field name="relation_selection"/></li>
-                                                                    <li><field name="phone_no"/></li>
-                                                                    <li><field name="collector_id"/></li>
-                                                                    <li><field name="create_date"/></li>
-                                                                    <li><field name="remark"/></li>
-                                                                </ul>
-                                                                <field name="file_ids" class="o_field_many2many" widget="attachment_preview"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </t>
-                                            </templates>
-                                        </kanban>
-                                    </field>
                                 </page>
-                            </notebook>  -->
+                            </notebook>    
+                            
                             <notebook>     
                                 <page string="催收记录"> 
                                     <field name="history_collection_record_ids" readonly="1">  
                                         <tree>  
                                             <field name="sequence" string="序号"/>  
+                                            <field name="collection_stage" string="催收阶段"/>
+                                            <field name="overdue_days" string="逾期天数"/> 
                                             <field name="user_id" string="催收对象"/>  
                                             <field name="relation_selection" string="与本人关系"/>  
                                             <field name="phone_no" string="跟踪电话"/>  
@@ -222,19 +234,21 @@
                             </notebook>                                     
                             <notebook>     
                                 <page string="借款记录">
-                                    <field name="history_loans_record_ids" readonly="1">  
+                                    <field name="loan_order_ids" readonly="1">  
                                         <tree>  
-                                            <field name="sequence" string="序号"/>  
+                                            <!-- <field name="sequence" string="序号"/>   -->
                                             <field name="order_no" string="订单编号"/>  
-                                            <field name="contract_amount" string="合同金额"/>  
-                                            <field name="borrow_money_date" string="借款期限"/>  
-                                            <field name="application_time" string="申请时间"/>  
-                                            <field name="product_name" string="产品名称"/>  
-                                            <field name="app_name" string="APP名称"/>  
-                                            <field name="loan_order_status_id" string="订单状态"/>  
-                                            <field name="credit_examiner" string="信审员"/>  
-                                            <field name="credit_audit_reason" string="信审原因"/>  
-                                            <field name="remark" string="备注"/>  
+                                            <field name="product_id" />  
+                                            <field name="contract_amount"/>  
+                                            <field name="loan_period" />  
+                                            <field name="pending_amount" />  
+                                            <field name="apply_time" />
+                                            <field name="repay_date" /> 
+                                            <field name="order_status" />
+                                            <field name="collection_stage_setting_id"/>  
+                                            <field name="overdue_days"/>     
+                                            <field name="collector_id" />
+                                            <button type="object" name="action_show_collection_record" string="催收记录" class="oe_highlight" />
                                         </tree>  
                                     </field>  
                                 </page>  
@@ -266,7 +280,7 @@
                                     <field name="pending_amount" string="挂账金额" optional="show"/>
                                     <field name="overdue_days" string="逾期天数" optional="show"/>
                                     <field name="collection_stage" string="催收阶段" optional="show"/>
-                                    <field name="product_name" string="产品名称" optional="show"/>
+                                    <field name="product_id" string="产品名称" optional="show"/>
                                 </group>
                             </page>
                         </notebook>
@@ -286,7 +300,7 @@
                     <field name="loan_uid" string="UserID" optional="show"/>
                     <field name="phone_no" string="手机号码" optional="show"/>
                     <field name="order_type" string="订单类型" optional="show"/>
-                    <field name="product_name" string="产品名称" optional="show"/>
+                    <field name="product_id" string="产品名称" optional="show"/>
                     <field name="app_name" string="APP名称" optional="show"/>
                     <field name="collection_stage" string="催收阶段" optional="show"/>
                     <field name="application_time" string="申请时间" optional="show"/>
@@ -304,6 +318,5 @@
                 action = model.action_server_collection_order_allot()
             </field>
         </record>
-
     </data>
 </odoo>

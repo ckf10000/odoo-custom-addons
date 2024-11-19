@@ -50,7 +50,7 @@
                         <field name="lang" readonly="0"/>
                         <field name="tz" readonly="0"/>
                         <field name="role_ids" widget="many2many_tags" required="1"/>
-                         <field name="is_collection"/>
+                        <field name="is_collection"/>
                         <field name="active" required="1" default="True"/>
                     </group>
                     <footer>
@@ -72,7 +72,7 @@
                 <field name="team_id"/>
                 <field name="merchant_id"/>
                 <!--                <field name="role_ids" string="Role"/>-->
-                <field name="active"/>
+                <field name="active" widget="boolean_selection" options="{'selection':[['', ''], ['1', '已启用'], ['0', '已禁用']]}"/>
             </search>
         </field>
     </record>

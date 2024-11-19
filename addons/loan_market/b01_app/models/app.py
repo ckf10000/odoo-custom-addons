@@ -119,23 +119,7 @@ class App(models.Model):
             app_settings = [{
                 "app_id": self.id,
                 "setting_item_id": setting.setting_item_id.id,
-
-                "sub_key_1": setting.sub_key_1,
-                "sub_name_1": setting.sub_name_1,
-                "sub_val_1": setting.sub_val_1,
-                "sub_type_1": setting.sub_type_1,
-
-                "sub_key_2": setting.sub_key_2,
-                "sub_name_2": setting.sub_name_2,
-                "sub_val_2": setting.sub_val_2,
-                "sub_type_2": setting.sub_type_2,
-
-                "sub_key_3": setting.sub_key_3,
-                "sub_name_3": setting.sub_name_3,
-                "sub_val_3": setting.sub_val_3,
-                "sub_type_3": setting.sub_type_3,
-
-                "item_vlaue": setting.item_vlaue
+                "item_value": setting.item_value
             } for setting in self.copy_app_id.setting_ids.filtered(lambda x: x.status)]
         else:
             app_settings = self.env['loan.app.setting.item']._get_app_dft_setting_items(self.id)
