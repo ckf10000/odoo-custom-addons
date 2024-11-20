@@ -9,21 +9,21 @@
                 <header>
                     <button name="action_show_create_refund_wizard" type="object" string="新建退款"/>
                 </header>
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" string="产品名称" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="loan_period" optional="show" width="150px"/>
-                <field name="apply_time" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="refund_payment_setting_id" optional="show" width="150px"/>
-                <field name="refund_payment_way_id" optional="show" width="150px"/>
-                <field name="loan_user_unrepay_order_count" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" string="产品名称" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="loan_period" optional="show" />
+                <field name="apply_time" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="refund_payment_setting_id" optional="show" />
+                <field name="refund_payment_way_id" optional="show" />
+                <field name="loan_user_unrepay_order_count" optional="show" />
                 
                 <button name="action_show_refund_wizard" type="object" string="退款"/>
             </tree>

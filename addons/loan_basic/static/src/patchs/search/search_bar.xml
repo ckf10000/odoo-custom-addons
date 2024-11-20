@@ -55,7 +55,7 @@
                                     </t>
                                 </t>
                                 <div class="o_field_widget d-flex" style="width:150px; margin-left:10px;">
-                                    <button class="btn btn-primary search_btn col-md-4" t-on-click="onSearch">Search</button>
+                                    <button class="btn btn-primary search_btn" t-on-click="onSearch">Search</button>
                                     <!-- <button class="btn btn-white remove_btn col-md-4" t-on-click="onReset">Reset</button>
                                     <div class="col-md-4">
                                         <Dropdown  togglerClass="'btn btn-white'">

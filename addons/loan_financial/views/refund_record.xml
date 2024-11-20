@@ -9,21 +9,21 @@
                 <header>
                     <button class="btn-primary" name="action_show_refund_wizard" type="object" string="新建退款" display="always" context="{'refund_type': '2'}"/>
                 </header>
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="loan_period" optional="show" width="150px"/>
-                <field name="apply_time" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px" string="退款渠道"/>
-                <field name="payment_way_id" optional="show" width="150px" string="退款方式"/>
-                <field name="loan_user_unrepay_order_count" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="loan_period" optional="show" />
+                <field name="apply_time" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="payment_setting_id" optional="show"  string="退款渠道"/>
+                <field name="payment_way_id" optional="show"  string="退款方式"/>
+                <field name="loan_user_unrepay_order_count" optional="show" />
                 
                 <button name="action_show_refund_wizard" type="object" string="退款" context="{'refund_type': '1'}"/>
             </tree>
@@ -114,25 +114,25 @@
         <field name="model">refund.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="refund_apply_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="refund_amount" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="refund_remark" optional="show" width="150px"/>
-                <field name="refund_type" optional="show" width="150px"/>
-                <field name="refund_apply_time" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="refund_amount" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="refund_remark" optional="show" />
+                <field name="refund_type" optional="show" />
+                <field name="refund_apply_time" optional="show" />
                 <field name="wait_duration_tip" column_invisible="1"/>
-                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show" width="150px" string="已处理时长"/>
-                <field name="refund_user_id" string="操作人" optional="show" width="150px"/>
+                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show"  string="已处理时长"/>
+                <field name="refund_user_id" string="操作人" optional="show" />
             </tree>
         </field>
     </record>
@@ -158,29 +158,29 @@
         <field name="model">refund.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="refund_complete_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="merchant_order_no" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="refund_amount" optional="show" width="150px"/>
-                <field name="refund_fee" optional="show" width="150px"/>
-                <field name="refund_tax" optional="hide" width="150px"/>
-                <field name="real_refund_amount" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="refund_remark" optional="show" width="150px"/>
-                <field name="refund_apply_time" optional="show" width="150px"/>
-                <field name="refund_complete_time" string="退款成功时间" optional="show" width="150px"/>
-                <field name="refund_type" optional="show" width="150px"/>
-                <field name="refund_user_id" string="操作人" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="merchant_order_no" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="refund_amount" optional="show" />
+                <field name="refund_fee" optional="show" />
+                <field name="refund_tax" optional="hide" />
+                <field name="real_refund_amount" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="refund_remark" optional="show" />
+                <field name="refund_apply_time" optional="show" />
+                <field name="refund_complete_time" string="退款成功时间" optional="show" />
+                <field name="refund_type" optional="show" />
+                <field name="refund_user_id" string="操作人" optional="show" />
 
                 <button name="action_show_voucher" type="object" string="退款凭证"/>
             </tree>
@@ -211,31 +211,31 @@
         <field name="model">refund.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="refund_complete_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="refund_amount" optional="show" width="150px"/>
-                <field name="refund_fee" optional="show" width="150px"/>
-                <field name="refund_tax" optional="hide" width="150px"/>
-                <field name="real_refund_amount" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="refund_remark" optional="show" width="150px"/>
-                <field name="refund_type" optional="show" width="150px"/>
-                <field name="refund_apply_time" optional="show" width="150px"/>
-                <field name="refund_complete_time" string="退款失败时间" optional="show" width="150px"/>
-                <field name="refund_count" optional="show" width="150px"/>
-                <field name="refund_fail_reason" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="refund_amount" optional="show" />
+                <field name="refund_fee" optional="show" />
+                <field name="refund_tax" optional="hide" />
+                <field name="real_refund_amount" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="refund_remark" optional="show" />
+                <field name="refund_type" optional="show" />
+                <field name="refund_apply_time" optional="show" />
+                <field name="refund_complete_time" string="退款失败时间" optional="show" />
+                <field name="refund_count" optional="show" />
+                <field name="refund_fail_reason" optional="show" />
                 <field name="wait_duration_tip" column_invisible="1"/>
-                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show" width="150px"/>
+                <field name="wait_duration" decoration-danger="wait_duration_tip" optional="show" />
 
                 <button name="action_refund_again" type="object" string="退款" confirm="是否确定重新退款？"/>
                 <button name="action_show_refuse_wizard" type="object" string="拒绝"/>
@@ -270,28 +270,28 @@
         <field name="model">refund.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="refuse_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="contract_amount" optional="show" width="150px"/>
-                <field name="platform_profit" optional="show" width="150px"/>
-                <field name="refund_amount" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="merchant_order_no" optional="show" width="150px"/>
-                <field name="refund_count" optional="show" width="150px"/>
-                <field name="bank_name" optional="show" width="150px"/>
-                <field name="bank_account_no" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="refund_remark" optional="show" width="150px"/>
-                <field name="refund_type" optional="show" width="150px"/>
-                <field name="refund_apply_time" optional="show" width="150px"/>
-                <field name="refuse_time" optional="show" width="150px"/>
-                <field name="refuse_reason" optional="show" width="150px"/>
-                <field name="refuse_user_id" optional="show" width="150px" string="操作人"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="contract_amount" optional="show" />
+                <field name="platform_profit" optional="show" />
+                <field name="refund_amount" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="merchant_order_no" optional="show" />
+                <field name="refund_count" optional="show" />
+                <field name="bank_name" optional="show" />
+                <field name="bank_account_no" optional="show" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="refund_remark" optional="show" />
+                <field name="refund_type" optional="show" />
+                <field name="refund_apply_time" optional="show" />
+                <field name="refuse_time" optional="show" />
+                <field name="refuse_reason" optional="show" />
+                <field name="refuse_user_id" optional="show"  string="操作人"/>
             </tree>
         </field>
     </record>

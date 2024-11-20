@@ -34,6 +34,7 @@ class PayController(http.Controller):
             }
             res = pay_utils.coin_pay.create_pay_order(data)
             pay_url = res.get('data', {}).get('payUrl')
+            platform_order_no = res.get('data', {}).get('payOrderId')
         else:
             data = {
                 'merchantNo': payment_channel.merchant_no,
@@ -46,6 +47,7 @@ class PayController(http.Controller):
             } 
             res = pay_utils.sf_pay.create_pay_order(data)
             pay_url = res.get('url', "")
+            platform_order_no = res.get('platformOrderNo', '')
 
         # 创建交易记录
         trade_data = {
@@ -57,7 +59,7 @@ class PayController(http.Controller):
             'trade_status': '1' if res.get('code', 999) == 200 else '3',
             'trade_type': '1',
             'trade_start_time': fields.Datetime.now(),
-            'platform_order_no': data.get('data', {}).get('payOrderId'),
+            'platform_order_no': platform_order_no,
             'trade_data': res,
             'res_model': 'repay.order',
             'res_id': repay_order.id

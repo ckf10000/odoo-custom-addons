@@ -50,7 +50,6 @@ $(document).on("click", ".sidebar_menu a", function (event) {
     if ($this.next().length === 1) {
     }
     menu.removeClass("active");
-    console.log(this)
     $this.addClass("active");
 });
 

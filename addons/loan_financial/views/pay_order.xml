@@ -99,37 +99,37 @@
         <field name="model">pay.order</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="pay_complete_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="order_user_id" optional="show" width="150px"/>
-                <field name="order_user_name" optional="show" width="150px"/>
-                <field name="order_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="merchant_order_no" string="支付ID" optional="show" width="150px"/>
-                <field name="order_contract_amount" optional="show" width="150px"/>
-                <field name="order_loan_period" optional="show" width="150px"/>
-                <field name="order_loan_amount" optional="show" width="150px"/>
-                <field name="pay_fee" optional="show" width="150px"/>
-                <field name="pay_tax" optional="hide" width="150px"/>
-                <field name="actual_pay_amount" optional="show" width="150px"/>
-                <field name="management_fee" optional="show" width="150px"/>
-                <field name="pay_interest" optional="hide" width="150px"/>
-                <field name="account_management_fee" optional="hide" width="150px"/>
-                <field name="platform_service_fee" optional="hide" width="150px"/>
-                <field name="risk_fee" optional="hide" width="150px"/>
-                <field name="credit_fee" optional="hide" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="order_apply_time" optional="show" width="150px"/>
-                <field name="financial_time" string="放款时间" optional="show" width="150px"/>
-                <field name="pay_complete_time" string="放款成功时间" optional="show" width="150px"/>
-                <field name="withdraw_time" optional="show" width="150px"/>
-                <field name="order_bank_name" optional="show" width="150px"/>
-                <field name="order_bank_account_no" optional="show" width="150px"/>
-                <field name="order_type" optional="show" width="150px"/>
-                <field name="pay_way_display" optional="show" width="150px"/>
-                <field name="pay_type" optional="show" width="150px"/>
-                <field name="financial_user_id" string="操作人" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="order_user_id" optional="show" />
+                <field name="order_user_name" optional="show" />
+                <field name="order_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="merchant_order_no" string="支付ID" optional="show" />
+                <field name="order_contract_amount" optional="show" />
+                <field name="order_loan_period" optional="show" />
+                <field name="order_loan_amount" optional="show" />
+                <field name="pay_fee" optional="show" />
+                <field name="pay_tax" optional="hide" />
+                <field name="actual_pay_amount" optional="show" />
+                <field name="management_fee" optional="show" />
+                <field name="pay_interest" optional="hide" />
+                <field name="account_management_fee" optional="hide" />
+                <field name="platform_service_fee" optional="hide" />
+                <field name="risk_fee" optional="hide" />
+                <field name="credit_fee" optional="hide" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="order_apply_time" optional="show" />
+                <field name="financial_time" string="放款时间" optional="show" />
+                <field name="pay_complete_time" string="放款成功时间" optional="show" />
+                <field name="withdraw_time" optional="show" />
+                <field name="order_bank_name" optional="show" />
+                <field name="order_bank_account_no" optional="show" />
+                <field name="order_type" optional="show" />
+                <field name="pay_way_display" optional="show" />
+                <field name="pay_type" optional="show" />
+                <field name="financial_user_id" string="操作人" optional="show" />
                 
                 <button name="action_show_voucher" type="object" string="放款凭证"/>
             </tree>
@@ -169,29 +169,29 @@
                 <button name="action_update_bank_account" type="object" string="修改账户" confirm="是否确定要求用户修改银行卡账户？" invisible="modify_account_status=='1'"/>
                 <field name="modify_account_status" column_invisible="1"/>
 
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="order_user_id" optional="show" width="150px"/>
-                <field name="financial_time" string="放款时间" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="order_user_id" optional="show" />
+                <field name="financial_time" string="放款时间" optional="show"/>
                 <field name="wait_duration_tip" column_invisible="1"/>
-                <field name="wait_duration" decoration-danger="wait_duration_tip"/>
-                <field name="pay_record_count" string="放款次数" optional="show" width="150px"/>
-                <field name="fail_reason"  optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="order_user_name" optional="show" width="150px"/>
-                <field name="order_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
+                <field name="wait_duration" decoration-danger="wait_duration_tip"  />
+                <field name="pay_record_count" string="放款次数" optional="show" />
+                <field name="fail_reason"  optional="show"  class="multiLine-item-pre-wrap " />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="order_user_name" optional="show" />
+                <field name="order_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="platform_order_no" optional="show" />
                 
-                <field name="order_contract_amount" optional="show" width="150px"/>
-                <field name="order_loan_period" optional="show" width="150px"/>
-                <field name="order_loan_amount" optional="show" width="150px"/>
-                <field name="pay_fee" optional="show" width="150px"/>
-                <field name="actual_pay_amount" optional="show" width="150px"/>
-                <field name="order_apply_time" optional="show" width="150px"/>
-                <field name="order_bank_name" optional="show" width="150px"/>
-                <field name="order_bank_account_no" optional="show" width="150px"/>
-                <field name="pay_way_display" optional="show" width="150px"/>
+                <field name="order_contract_amount" optional="show" />
+                <field name="order_loan_period" optional="show" />
+                <field name="order_loan_amount" optional="show" />
+                <field name="pay_fee" optional="show" />
+                <field name="actual_pay_amount" optional="show" />
+                <field name="order_apply_time" optional="show" />
+                <field name="order_bank_name" optional="show" />
+                <field name="order_bank_account_no" optional="show" />
+                <field name="pay_way_display" optional="show" />
 
                 <button name="test_pay" type="object" string="放款成功"/>
             </tree>
@@ -218,25 +218,25 @@
         <field name="model">pay.order</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="refuse_time desc">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="merchant_order_no"  optional="show" width="150px"/>
-                <field name="order_user_id" optional="show" width="150px"/>
-                <field name="pay_record_count" optional="show" width="150px"/>
-                <field name="payment_setting_id" optional="show" width="150px"/>
-                <field name="payment_way_id" optional="show" width="150px"/>
-                <field name="order_user_name" optional="show" width="150px"/>
-                <field name="order_user_phone" optional="show" width="150px"/>
-                <field name="order_bank_name" optional="hide" width="150px"/>
-                <field name="order_bank_account_no" optional="show" width="150px"/>
-                <field name="order_contract_amount" optional="show" width="150px"/>
-                <field name="order_loan_period" optional="show" width="150px"/>
-                <field name="order_loan_amount" optional="show" width="150px"/>
-                <field name="order_apply_time" optional="show" width="150px"/>
-                <field name="financial_time" string="放款时间" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="merchant_order_no"  optional="show" />
+                <field name="order_user_id" optional="show" />
+                <field name="pay_record_count" optional="show" />
+                <field name="payment_setting_id" optional="show" />
+                <field name="payment_way_id" optional="show" />
+                <field name="order_user_name" optional="show" />
+                <field name="order_user_phone" optional="show" />
+                <field name="order_bank_name" optional="hide" />
+                <field name="order_bank_account_no" optional="show" />
+                <field name="order_contract_amount" optional="show" />
+                <field name="order_loan_period" optional="show" />
+                <field name="order_loan_amount" optional="show" />
+                <field name="order_apply_time" optional="show" />
+                <field name="financial_time" string="放款时间" optional="show" />
 
-                <field name="refuse_time"  optional="show" width="150px"/>
-                <field name="refuse_reason" optional="show" width="150px"/>
+                <field name="refuse_time"  optional="show" />
+                <field name="refuse_reason" optional="show" />
             </tree>
         </field>
     </record>

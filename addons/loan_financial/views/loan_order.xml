@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="apply_time desc">
                 <!-- <button name="create_new_order" type="object" string="展期" /> -->
-                <field name="order_no"/>
+                <field name="order_no" />
                 <field name="loan_uid"/>
                 <field name="loan_user_name"/>
                 <field name="loan_user_phone"/>

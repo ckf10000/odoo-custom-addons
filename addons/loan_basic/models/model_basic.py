@@ -28,7 +28,7 @@ class LoanBasicModel(models.AbstractModel):
         列表点击编辑按钮
         """
         return {
-            'name': '编辑',
+            'name': '编辑' if self.env.user.lang == "zh_CN" else "Edit",
             'type': 'ir.actions.act_window',
             'res_model': self._name,
             'res_id': self.id,
@@ -42,7 +42,7 @@ class LoanBasicModel(models.AbstractModel):
         列表点击新增按钮
         """
         return {
-            'name': '新增',
+            'name': '新增' if self.env.user.lang == "zh_CN" else "Add",
             'type': 'ir.actions.act_window',
             'res_model': self._name,
             'view_mode': 'form',

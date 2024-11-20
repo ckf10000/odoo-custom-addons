@@ -10,17 +10,19 @@ class ManualAllocationWizard(models.TransientModel):
     _table = 'C_manual_allocation_wizard'
     _description = '手动分单向导'
 
-    selected_ids = fields.Integer(string='已选择订单数量')
-    collection_stage = fields.Char(string='催收阶段')
-    collector_id = fields.Many2one('res.users', string='分配对象')  # 催收员
+    selected_ids = fields.Integer(string=_('The Selected Order Quantity'))
+    collection_stage = fields.Char(string=_('Collection Stage'))
+    collector_id = fields.Many2one('res.users', string=_('Allocation Target'))  # 催收员
 
     def action_confirm(self):
         """
         确认按钮
         """
-
+        lang = self.env.user.lang
         if not self.collector_id:
-            raise ValidationError(_('没有可选对象，请调整“分单管理”配置!'))
+            msg = '没有可选对象，请调整"分单管理"配置!' if lang == "zh_CN" else \
+                "There are no selectable objects, please adjust the 'Order Allocation Management' configuration!"
+            raise ValidationError(msg)
         else:
             order_ids = self.env['collection.order'].browse(self._context.get('active_ids'))
             # 催收员必须是当前催收阶段，进件已开启
@@ -53,9 +55,9 @@ class ManualAllocationWizard(models.TransientModel):
                             }
                         )
                 if self.selected_ids == can_count:
-                    message = '分单成功'
+                    message = '分单成功' if lang == "zh_CN" else "Assignation successful!"
                 else:
-                    message = f'分单成功数量：{can_count}, \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员“进件产品”范围)'
+                    message = f'分单成功数量：{can_count}, \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员"进件产品"范围)' if lang == "zh_CN" else f'Number of successful assignation orders: {can_count}, \nNumber of failed assignation orders：{not_included_product} \n(The ordered product is not within the scope of the "Incoming Product Type" of the collector)'
             elif today_allocated_qty < points_id.max_daily_intake < today_allocated_qty + can_count:
                 allocated_order_ids = can_allocated_ids[:points_id.max_daily_intake - today_allocated_qty]
                 if allocated_order_ids:
@@ -72,18 +74,21 @@ class ManualAllocationWizard(models.TransientModel):
                                 'allot_date': date.today()
                             }
                         )
-                message = f"分单成功数量：{len(allocated_order_ids)}, \n分单失败数量：{can_count - (points_id.max_daily_intake - today_allocated_qty)} \n(已达到该催收员今日进件上限)"
+                failed_total = can_count - (points_id.max_daily_intake - today_allocated_qty)
+                message = f"分单成功数量：{len(allocated_order_ids)}, \n分单失败数量：{failed_total} \n(已达到该催收员今日进件上限)" if lang == "zh_CN" else f"Number of successful assignation orders：{len(allocated_order_ids)}, \nNumber of failed assignation orders：{failed_total} \n(The collector has reached the daily case intake limit.)"
                 if not_included_product > 0:
-                    message = message + f", \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员“进件产品”范围)"
+                    sub_message = f', \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员"进件产品"范围)' if lang == "zh_CN" else f', \nNumber of failed assignation orders：{not_included_product} \n(The ordered product is not within the scope of the "Incoming Product Type" of the collector)'
+                    message = message + sub_message
             else:
-                message = f"分单成功数量：0, \n分单失败数量：{self.selected_ids} \n(已达到该催收员今日进件上限)"
+                message = f"分单成功数量：0, \n分单失败数量：{self.selected_ids} \n(已达到该催收员今日进件上限)" if lang == "zh_CN" else f"Number of successful assignation orders：0, \nNumber of failed assignation orders：{self.selected_ids} \n(The collector has reached the daily case intake limit.)"
                 if not_included_product > 0:
-                    message = message + f", \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员“进件产品”范围)"
+                    sub_message = f', \n分单失败数量：{not_included_product} \n(订单产品不属于该催收员"进件产品"范围)' if lang == "zh_CN" else f', \nNumber of failed assignation orders：{not_included_product} \n(The ordered product is not within the scope of the "Incoming Product Type" of the collector)'
+                    message = message + sub_message
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
-                    'title': '提示',
+                    'title': '提示' if lang == "zh_CN" else "Prompt",
                     'message': message,
                     'sticky': False,
                     'next': {'type': 'ir.actions.act_window_close'},

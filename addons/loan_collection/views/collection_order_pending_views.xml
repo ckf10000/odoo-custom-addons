@@ -2,182 +2,184 @@
     <data>
         <!-- Views-->  
         <record model="ir.ui.view" id="collection_order_pending_list">  
-            <field name="name">待处理订单</field>  
+            <field name="name">Pending Transaction List</field>
             <field name="model">collection.order</field>  
             <field name="arch" type="xml">  
                 <tree create="false" import="false" export_xlsx="false" limit="20">  
-                    <field name="order_no" string="订单编号"/>  
-                    <field name="loan_uid" string="UserID"/>  
-                    <field name="order_type" string="订单类型"/>  
-                    <field name="name" string="姓名"/>  
-                    <field name="phone_no" string="手机号码"/>  
-                    <field name="card_num" string="证件号码"/>  
-                    <field name="application_time" string="申请时间"/>  
-                    <field name="contract_amount" string="合同金额"/>  
-                    <field name="borrow_money_date" string="借款期限"/>  
-                    <field name="repay_date" string="应还日期" widget="date"/>  
-                    <field name="pending_amount" string="挂账金额"/>  
-                    <field name="overdue_days" string="逾期天数"/>  
-                    <field name="collection_stage" string="催收阶段"/>  
-                    <field name="product_id" string="产品名称"/>  
-                    <field name="app_name" string="APP名称"/>  
-                    <field name="version" string="版本号"/>  
-                    <button name="action_follow_up" type="object" string="跟进"/>  
-                    <button name="action_loan_voucher" type="object" string="放款凭证"/>  
+                    <field name="order_no" />
+                    <field name="loan_uid" />
+                    <field name="order_type" />
+                    <field name="name" />
+                    <field name="phone_no" />
+                    <field name="card_num" />
+                    <field name="application_time" />
+                    <field name="contract_amount" />
+                    <field name="borrow_money_date" />
+                    <field name="repay_date" widget="date"/>
+                    <field name="pending_amount" />
+                    <field name="overdue_days" />
+                    <field name="collection_stage" />
+                    <field name="product_id" />
+                    <field name="app_name" />
+                    <field name="version" />
+                    <button name="action_follow_up" type="object" string="Follow-up"/>
+                    <button name="action_loan_voucher" type="object" string="Loan voucher"/>
                 </tree>  
             </field>  
         </record>   
 
         <record model="ir.ui.view" id="collection_order_pending_form">  
-            <field name="name">待处理订单</field>  
+            <field name="name">Pending Transaction List</field>
             <field name="model">collection.order</field>  
             <field name="arch" type="xml">  
-                <form string="待处理订单" edit="1" create="0" delete="0">  
+                <form string="Pending Transaction List" edit="1" create="0" delete="0">
                     <header>
                         <field name="id" invisible="1"/>
-                        <button string="添加催记" icon="fa-plus" type="action" name="%(loan_collection.act_history_collection_record)d" context="{'default_collection_order_id': active_id}"/>
+                        <button string="Add Collection Record" icon="fa-plus" type="action"
+                                name="%(loan_collection.act_history_collection_record)d"
+                                context="{'default_collection_order_id': active_id}"/>
                     </header>                
                     <sheet>  
-                            <group string="订单信息" name="order_info" col="3">  
+                            <group string="Order Information" name="order_info" col="3">
                                 <group>  
-                                    <field name="order_no" string="订单编号" optional="show" readonly="1"/>  
-                                    <field name="contract_amount" string="合同金额" optional="show" readonly="1"/>  
-                                    <field name="application_time" string="申请时间" optional="show" readonly="1"/>  
-                                    <field name="repay_amount" string="应还本息" optional="show" readonly="1"/>  
-                                    <field name="contract_amount" string="应还本金" optional="show" readonly="1"/>  
-                                    <field name="pending_amount" string="挂账金额" optional="show" readonly="1"/>  
-                                    <field name="repayed_amount" string="已还金额" optional="show" readonly="1"/>  
-                                    <field name="renewal_repayment_amount" string="申请展期需支付金额" optional="show" readonly="1"/>  
-                                    <field name="add_renewal_no" string="累计展期次数" optional="show" readonly="1"/>  
-                                    <field name="app_name" string="APP名称" optional="show" readonly="1"/>  
+                                    <field name="order_no" optional="show" readonly="1"/>
+                                    <field name="contract_amount" optional="show" readonly="1"/>
+                                    <field name="application_time" optional="show" readonly="1"/>
+                                    <field name="repay_amount" optional="show" readonly="1"/>
+                                    <field name="contract_amount" optional="show" readonly="1"/>
+                                    <field name="pending_amount" optional="show" readonly="1"/>
+                                    <field name="repayed_amount" optional="show" readonly="1"/>
+                                    <field name="renewal_repayment_amount" optional="show" readonly="1"/>
+                                    <field name="add_renewal_no" optional="show" readonly="1"/>
+                                    <field name="app_name" optional="show" readonly="1"/>
                                 </group>  
                                 <group colspan="1">  
-                                    <field name="order_type" string="订单类型" optional="show" readonly="1" />  
-                                    <field name="loan_amount" string="放款金额" optional="show" readonly="1" />  
-                                    <field name="pay_complete_time" string="放款成功时间" optional="show" readonly="1" />  
-                                    <field name="overdue_fee" string="应还罚息" optional="show" readonly="1"/>  
-                                    <field name="derate_amount" string="减免金额" optional="show" readonly="1"/>  
-                                    <field name="apply_time" string="展期申请时间" optional="show" readonly="1"/>  
-                                    <field name="product_id" string="产品名称" optional="show" readonly="1" />  
+                                    <field name="order_type" optional="show" readonly="1" />
+                                    <field name="loan_amount" optional="show" readonly="1" />
+                                    <field name="pay_complete_time" optional="show" readonly="1" />
+                                    <field name="overdue_fee" optional="show" readonly="1"/>
+                                    <field name="derate_amount" optional="show" readonly="1"/>
+                                    <field name="apply_time" optional="show" readonly="1"/>
+                                    <field name="product_id" optional="show" readonly="1" />
                                 </group>  
                                 <group colspan="1">  
-                                    <field name="borrow_money_date" string="借款期限" optional="show" readonly="1"/>  
-                                    <field name="repay_date" string="应还日期" widget="date" optional="show" readonly="1"/>  
-                                    <field name="late_fee" string="应还滞纳金" optional="show" readonly="1"/>  
-                                    <field name="overdue_days" string="逾期天数" optional="show" readonly="1"/>  
-                                    <field name="extend_success_time" string="展期完成时间" optional="show" readonly="1"/>  
-                                    <field name="repay_platform_order_no" string="还款序列号" optional="show" readonly="1"/>  
+                                    <field name="borrow_money_date"  optional="show" readonly="1"/>
+                                    <field name="repay_date" swidget="date" optional="show" readonly="1"/>
+                                    <field name="late_fee" optional="show" readonly="1"/>
+                                    <field name="overdue_days" optional="show" readonly="1"/>
+                                    <field name="extend_success_time" optional="show" readonly="1"/>
+                                    <field name="repay_platform_order_no" optional="show" readonly="1"/>
                                 </group>  
                             </group>  
-                            <group string="身份信息" name="id_info" col="3">  
+                            <group string="Identity Information" name="id_info" col="3">
                                 <group>  
-                                    <field name="loan_uid" string="UserID" optional="show" readonly="1"/>  
-                                    <field name="gender_code" string="性别" optional="show" readonly="1"/>  
-                                    <field name="marital_status_code" string="婚姻状况" optional="show" readonly="1"/>  
-                                    <field name="loan_purpose_code" string="贷款用途" optional="show" readonly="1"/>  
-                                    <field name="pay_day_code" string="发薪日" optional="show" readonly="1"/>  
+                                    <field name="loan_uid" optional="show" readonly="1"/>
+                                    <field name="gender_code" optional="show" readonly="1"/>
+                                    <field name="marital_status_code" optional="show" readonly="1"/>
+                                    <field name="loan_purpose_code" optional="show" readonly="1"/>
+                                    <field name="pay_day_code" optional="show" readonly="1"/>
                                 </group>  
                                 <group>  
-                                    <field name="name" string="姓名" optional="show" readonly="1"/>  
-                                    <field name="birth_date" string="出生日期" optional="show" readonly="1"/>  
-                                    <field name="housing_status_code" string="住房情况" optional="show" readonly="1"/>  
-                                    <field name="occupation_code" string="职业" optional="show" readonly="1"/>  
-                                    <field name="card_num" string="身份证号码" optional="show" readonly="1"/>  
+                                    <field name="name" optional="show" readonly="1"/>
+                                    <field name="birth_date" optional="show" readonly="1"/>
+                                    <field name="housing_status_code" optional="show" readonly="1"/>
+                                    <field name="occupation_code" optional="show" readonly="1"/>
+                                    <field name="card_num" optional="show" readonly="1"/>
                                 </group>  
                                 <group>
-                                    <field name="phone_no" string="手机号码" optional="show" readonly="1"/>
-                                    <field name="education_code" string="学历" optional="show" readonly="1"/>
-                                    <field name="children_num_code" string="子女数量" optional="show" readonly="1"/>
-                                    <field name="salary_code" string="薪资" optional="show" readonly="1"/>
+                                    <field name="phone_no" optional="show" readonly="1"/>
+                                    <field name="education_code" optional="show" readonly="1"/>
+                                    <field name="children_num_code" optional="show" readonly="1"/>
+                                    <field name="salary_code" optional="show" readonly="1"/>
                                 </group> 
                             </group>  
-                            <group col="5" string="活体&amp;证照信息" name="body_info" >
+                            <group col="5" string="Face Recognition&amp;Identity Document Information" name="body_info" >
                                 <group colspan="1">
-                                    <field name="pan_front_img" string="PAN卡正面照" widget="image" options='{"zoom":true}' readonly="1"/>
+                                    <field name="pan_front_img" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                                 <group colspan="1">
-                                    <field name="pan_back_img" string="PAN卡背面照" widget="image" options='{"zoom":true}' readonly="1"/>
+                                    <field name="pan_back_img" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                                 <group colspan="1">
-                                    <field name="id_front_img" string="ID卡正面照" widget="image" options='{"zoom":true}' readonly="1"/>
+                                    <field name="id_front_img" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                                 <group colspan="1">
-                                    <field name="id_hand_img" string="ID卡手持照" widget="image" options='{"zoom":true}' readonly="1"/>
+                                    <field name="id_hand_img" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                                 <group colspan="1">
-                                        <field name="body_discern_img" string="活体识别照" widget="image" options='{"zoom":true}' readonly="1"/>
+                                        <field name="body_discern_img" widget="image" options='{"zoom":true}' readonly="1"/>
                                 </group>
                             </group>                             
                             <notebook>  
-                                <page string="联系人信息">  
+                                <page string="Contact Information">
                                     <group name="user_info">
                                         <!--<button class="btn-primary" name="action_add_contact" type="object" string="补充联系人" display="always"/>-->
-                                        <field name="collection_user_contact_ids" string="联系人信息" edit="1" create="1" delete="0" nolabel="1" colspan="2"> 
+                                        <field name="collection_user_contact_ids" edit="1" create="1" delete="0" nolabel="1" colspan="2">
                                             <tree editable="bottom" delete="0">
                                                 <field name="can_edit" invisible="1"/>
-                                                <field name="sequence" string="序号" widget="handle" readonly="not can_edit" width="50px"/>
-                                                <field name="name" string="联系人姓名" required="1" readonly="not can_edit"/>
-                                                <field name="relation_selection" string="关系" required="1" readonly="not can_edit"/>
-                                                <field name="phone_no" string="电话" required="1" readonly="not can_edit"/>
-                                                <field name="add_date" string="补充时间" readonly="1"/>
-                                                <field name="add_user_id" string="操作人" readonly="1"/>
+                                                <field name="sequence" widget="handle" readonly="not can_edit" width="50px"/>
+                                                <field name="name" required="1" readonly="not can_edit"/>
+                                                <field name="relation_selection" required="1" readonly="not can_edit"/>
+                                                <field name="phone_no" required="1" readonly="not can_edit"/>
+                                                <field name="add_date" readonly="1"/>
+                                                <field name="add_user_id" readonly="1"/>
                                                 <!-- <button name="action_edit" type="object" string="编辑"/> -->
-                                                <button name="unlink" type="object" icon="fa-trash-o" title="删除" invisible="not can_edit"/>
+                                                <button name="unlink" type="object" icon="fa-trash-o" title="Delete" invisible="not can_edit"/>
                                             </tree>
                                         </field>
                                     </group>
                                 </page>  
                             </notebook>
                             <notebook >  
-                                <page string="通讯录">  
+                                <page string="Address Book">
                                     <field name="user_address_book_ids" readonly="1">  
                                         <tree>  
-                                            <field name="sequence" string="序号"/>  
-                                            <field name="name" string="姓名"/>  
-                                            <field name="phone_no" string="电话号码"/>  
+                                            <field name="sequence" />
+                                            <field name="name" />
+                                            <field name="phone_no" />
                                         </tree>  
                                     </field>  
                                 </page> 
-                                <page string="通话记录">  
+                                <page string="Call records">
                                     <field name="user_call_record_ids" readonly="1">  
                                         <tree>  
-                                            <field name="sequence" string="序号"/>  
-                                            <field name="name" string="姓名"/>  
-                                            <field name="phone_no" string="电话号码"/>  
-                                            <field name="call_type" string="通话类型"/>  
-                                            <field name="call_time" string="通话时间"/>  
-                                            <field name="total_call_times" string="通话总次数"/>  
-                                            <field name="total_call_duration" string="通话总时长(m)"/>  
+                                            <field name="sequence"/>
+                                            <field name="name"/>
+                                            <field name="phone_no"/>
+                                            <field name="call_type" />
+                                            <field name="call_time" />
+                                            <field name="total_call_times" />
+                                            <field name="total_call_duration" />
                                         </tree>  
                                     </field>  
                                 </page>  
                             </notebook>    
                             
                             <notebook>     
-                                <page string="催收记录"> 
+                                <page string="Collection Record">
                                     <field name="history_collection_record_ids" edit="1" create="0" delete="1" nolabel="1" colspan="2">  
                                         <tree>  
-                                            <field name="sequence" string="序号"/>  
-                                            <field name="collection_stage" string="催收阶段"/>
-                                            <field name="overdue_days" string="逾期天数"/>                                             
-                                            <field name="user_id" string="催收对象"/>  
-                                            <field name="relation_selection" string="与本人关系"/>  
-                                            <field name="phone_no" string="跟踪电话"/>  
-                                            <field name="collection_type" string="催收形式"/>  
-                                            <field name="contact_result" string="联络结果"/>  
-                                            <field name="remark" string="备注"/>  
-                                            <field name="file_ids" string="附件图片" widget="many2many_binary"/>  
-                                            <field name="create_date" string="跟进时间"/>  
-                                            <field name="collector_id" string="催收员"/>  
+                                            <field name="sequence"/>
+                                            <field name="collection_stage"/>
+                                            <field name="overdue_days"/>
+                                            <field name="user_id"/>
+                                            <field name="relation_selection"/>
+                                            <field name="phone_no"/>
+                                            <field name="collection_type"/>
+                                            <field name="contact_result"/>
+                                            <field name="remark"/>
+                                            <field name="file_ids" widget="many2many_binary"/>
+                                            <field name="create_date" />
+                                            <field name="collector_id" />
                                         </tree>  
                                     </field>  
                                 </page>  
                             </notebook>                                     
                             <notebook>     
-                                <page string="借款记录">
+                                <page string="oan Record">
                                     <field name="loan_order_ids" readonly="1">  
                                         <tree>  
-                                            <field name="order_no" string="订单编号"/>  
+                                            <field name="order_no"/>
                                             <field name="product_id" />  
                                             <field name="contract_amount"/>  
                                             <field name="loan_period" />  
@@ -198,25 +200,25 @@
         </record>  
 
         <record model="ir.ui.view" id="collection_order_pending_form2">
-            <field name="name">待处理订单-放款凭证</field>
+            <field name="name">Pending Transaction List - Loan voucher</field>
             <field name="model">collection.order</field>
             <field name="arch" type="xml">
-                <form string="放款凭证">
+                <form string="Loan voucher">
                     <sheet>
                         <group>
-                            <field name="contract_amount" string="合同金额" readonly="1"/>
-                            <field name="loan_amount" string="放款金额" readonly="1"/>
-                            <field name="borrow_money_date" string="借款期限" readonly="1"/>
-                            <field name="application_time" string="申请时间" readonly="1"/>
-                            <field name="pay_complete_time" string="放款成功时间" readonly="1"/>
-                            <field name="withdraw_time" string="取现时间" readonly="1"/>
-                            <field name="pay_platform_order_no" string="放款序列号" readonly="1"/>
-                            <field name="receivables_number" string="收款账号" readonly="1"/>
-                            <field name="payment_way_id" string="放款方式" readonly="1"/>
+                            <field name="contract_amount" readonly="1"/>
+                            <field name="loan_amount" readonly="1"/>
+                            <field name="borrow_money_date" readonly="1"/>
+                            <field name="application_time" readonly="1"/>
+                            <field name="pay_complete_time" readonly="1"/>
+                            <field name="withdraw_time" readonly="1"/>
+                            <field name="pay_platform_order_no" readonly="1"/>
+                            <field name="receivables_number" readonly="1"/>
+                            <field name="payment_way_id" readonly="1"/>
                         </group>
                     </sheet>
                     <footer>
-                        <button name="action_download_voucher" string="下载凭证" type="object"
+                        <button name="action_download_voucher" string="Download credentials" type="object"
                                 class="btn-primary"/>
                     </footer>
                 </form>
@@ -224,21 +226,21 @@
         </record>
 
         <record model="ir.ui.view" id="collection_order_pending_form3">
-            <field name="name">待处理订单-放款凭证</field>
+            <field name="name">Pending Transaction List - Loan voucher</field>
             <field name="model">collection.order</field>
             <field name="arch" type="xml">
-                <form string="放款凭证">
+                <form string="Loan voucher">
                     <sheet>
                         <group>
-                            <field name="contract_amount" string="合同金额"/>
-                            <field name="loan_amount" string="放款金额"/>
-                            <field name="borrow_money_date" string="借款期限"/>
-                            <field name="application_time" string="申请时间"/>
-                            <field name="pay_complete_time" string="放款成功时间"/>
-                            <field name="withdraw_time" string="取现时间"/>
-                            <field name="pay_platform_order_no" string="放款序列号"/>
-                            <field name="receivables_number" string="收款账号"/>
-                            <field name="payment_way_id" string="放款方式"/>
+                            <field name="contract_amount"/>
+                            <field name="loan_amount"/>
+                            <field name="borrow_money_date"/>
+                            <field name="application_time"/>
+                            <field name="pay_complete_time"/>
+                            <field name="withdraw_time"/>
+                            <field name="pay_platform_order_no"/>
+                            <field name="receivables_number"/>
+                            <field name="payment_way_id"/>
                         </group>
                     </sheet>
                 </form>
@@ -248,25 +250,25 @@
 
         <!-- search view -->
         <record model="ir.ui.view" id="collection_order_pending_search">
-            <field name="name">待处理订单</field>
+            <field name="name">Pending Transaction List</field>
             <field name="model">collection.order</field>
             <field name="arch" type="xml">
                 <search>
-                    <field name="order_no" string="订单编号" optional="show"/>
-                    <field name="loan_uid" string="UserID" optional="show"/>
-                    <field name="phone_no" string="手机号码" optional="show"/>
-                    <field name="order_type" string="订单类型" optional="show"/>
-                    <field name="product_id" string="产品名称" optional="show"/>
-                    <field name="app_name" string="APP名称" optional="show"/>
-                    <field name="collection_stage" string="催收阶段" optional="show"/>
-                    <field name="collector_name" string="催收员" optional="show"/>
-                    <field name="application_time" string="申请时间" optional="show"/>
+                    <field name="order_no" optional="show"/>
+                    <field name="loan_uid" optional="show"/>
+                    <field name="phone_no" optional="show"/>
+                    <field name="order_type" optional="show"/>
+                    <field name="product_id" optional="show"/>
+                    <field name="app_name" optional="show"/>
+                    <field name="collection_stage" optional="show"/>
+                    <field name="collector_name" optional="show"/>
+                    <field name="application_time" optional="show"/>
                 </search>
             </field>
         </record>
 
         <record model="ir.actions.server" id="collection_order_pending_action">
-            <field name="name">待处理订单</field>
+            <field name="name">Pending Transaction List</field>
             <field name="type">ir.actions.server</field>
             <field name="state">code</field>
             <field name="model_id" ref="loan_collection.model_collection_order"/>

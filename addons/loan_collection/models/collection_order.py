@@ -1,7 +1,7 @@
 import logging
 import requests
 import base64
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 from datetime import datetime, date
 from odoo.exceptions import ValidationError
 from odoo.exceptions import UserError
@@ -15,68 +15,70 @@ class CollectionOrder(models.Model):
     _table = "C_order"
     _description = "催收订单"
 
-    order_status_id = fields.Many2one("collection.order.status", string="催收订单状态")
-    collection_status = fields.Char(string="催收状态", related="order_status_id.code")
-    loan_order_id = fields.Many2one("loan.order", string="关联订单")
+    order_status_id = fields.Many2one("collection.order.status", string=_("Collection Order Status"))
+    collection_status = fields.Char(string=_("Collection Status"), related="order_status_id.code")
+    loan_order_id = fields.Many2one("loan.order", string=_("Associated Orders"))
     user_id = fields.Many2one(
-        "loan.user", string="关联用户", related="loan_order_id.loan_user_id", store=True
+        "loan.user", string=_("Associate Users"), related="loan_order_id.loan_user_id", store=True
     )
-    order_no = fields.Char(string="订单编号", related="loan_order_id.order_no", store=True)
-    loan_uid = fields.Integer('UserID', related='loan_order_id.loan_uid')
-    name = fields.Char(string="姓名", related="loan_order_id.loan_user_name", store=True)
-    order_type = fields.Selection(selection=enums.ORDER_TYPE, string='订单类型', related="loan_order_id.order_type", store=True)
+    order_no = fields.Char(string=_("Order ID"), related="loan_order_id.order_no", store=True)
+    loan_uid = fields.Integer(_('UserID'), related='loan_order_id.loan_uid')
+    name = fields.Char(string=_("Name"), related="loan_order_id.loan_user_name", store=True)
+    order_type = fields.Selection(selection=enums.ORDER_TYPE, string=_('Order Type'),
+                                  related="loan_order_id.order_type", store=True)
 
-    phone_no = fields.Char(string="手机号码", related="loan_order_id.loan_user_phone", store=True)
+    phone_no = fields.Char(string=_("Phone Number"), related="loan_order_id.loan_user_phone", store=True)
 
     application_time = fields.Datetime(
-        string="申请时间", related="loan_order_id.apply_time", store=True
+        string=_("Application Date"), related="loan_order_id.apply_time", store=True
     )
     contract_amount = fields.Float(
-        string="合同金额", related="loan_order_id.contract_amount"
+        string=_("Contract Amount"), related="loan_order_id.contract_amount"
     )
     borrow_money_date = fields.Integer(
-        string="借款期限(天)", related="loan_order_id.loan_period", store=True
+        string=_("Borrowing cycle（Days)"), related="loan_order_id.loan_period", store=True
     )
     collection_stage_setting_id = fields.Many2one(
-        "collection.stage.setting", string="催收阶段配置"
+        "collection.stage.setting", string=_("Collection Phase Configuration")
     )
     collection_stage = fields.Char(
-        string="催收阶段",
+        string=_("Collection Stage"),
         related="collection_stage_setting_id.collection_stage",
         store=True,
     )
-    product_id = fields.Many2one('loan.product', string='产品名称', related="loan_order_id.product_id")
+    product_id = fields.Many2one('loan.product', string=_('Product Name'),
+                                 related="loan_order_id.product_id")
     app_id = fields.Many2one(
-        "loan.app", string="App", related="user_id.app_id", store=True
+        "loan.app", string=_("App"), related="user_id.app_id", store=True
     )
-    app_name = fields.Char(string="APP名称", related="app_id.app_name", store=True)
-    version = fields.Integer(string="版本号", compute="_compute_version", store=True)
+    app_name = fields.Char(string=_("APP name"), related="app_id.app_name", store=True)
+    version = fields.Integer(string=_("Version"), compute="_compute_version", store=True)
     
     # 放款
-    pay_complete_time = fields.Datetime(string='放款成功时间',related="loan_order_id.pay_complete_time")
-    withdraw_time = fields.Datetime(string='取现时间',related="loan_order_id.withdraw_time")
-    pay_platform_order_no = fields.Char(string='放款序列号',related="loan_order_id.pay_platform_order_no")
+    pay_complete_time = fields.Datetime(string=_('Loan Complete Time'),related="loan_order_id.pay_complete_time")
+    withdraw_time = fields.Datetime(string=_('Withdrawal Time'),related="loan_order_id.withdraw_time")
+    pay_platform_order_no = fields.Char(string=_('Control Number'),related="loan_order_id.pay_platform_order_no")
         
 
     # 还款数据
     # repay_complete_time = fields.Datetime(string='还款完成时间',related="loan_order_id.repay_complete_time")
-    repay_date = fields.Date(string='应还日期', related="loan_order_id.repay_date")
-    overdue_days = fields.Integer(string='逾期天数', related="loan_order_id.overdue_days", store=True)
+    repay_date = fields.Date(string=_('Due Time of Repayment'), related="loan_order_id.repay_date")
+    overdue_days = fields.Integer(string=_('Overdue Days'), related="loan_order_id.overdue_days", store=True)
     # is_overdue = fields.Boolean(string='是否逾期', related="loan_order_id.is_overdue")
     # overdue_rate = fields.Float('逾期罚息费率', related='product_id.penalty_interest_rate')
-    overdue_fee = fields.Float('应还罚息', related='loan_order_id.overdue_fee')
-    late_fee = fields.Float('应还滞纳金', related='loan_order_id.late_fee')
-    repay_amount = fields.Float('应还本息', related='loan_order_id.repay_amount')
-    correction_amount = fields.Float('冲正金额', related='loan_order_id.correction_amount')
+    overdue_fee = fields.Float(_('Due Penalty'), related='loan_order_id.overdue_fee')
+    late_fee = fields.Float(_('Due Overdue Fine'), related='loan_order_id.late_fee')
+    repay_amount = fields.Float(_('Due Principal And Interest'), related='loan_order_id.repay_amount')
+    correction_amount = fields.Float(_('Reversal Amount'), related='loan_order_id.correction_amount')
 
-    repayed_amount = fields.Float('已还款金额', related='loan_order_id.repayed_amount')
+    repayed_amount = fields.Float(_('Repaid Amount'), related='loan_order_id.repayed_amount')
     # repayed_overdue_fee = fields.Float('已还罚息', related='loan_order_id.repayed_overdue_fee')
     # platform_profit = fields.Float('平台额外收益', related='loan_order_id.platform_profit')
-    pending_amount = fields.Float('挂账金额', related='loan_order_id.pending_amount') # 待还金额
-    repay_platform_order_no = fields.Char(string='还款序列号', related='loan_order_id.repay_platform_order_no')
+    pending_amount = fields.Float(_('Bill Amount'), related='loan_order_id.pending_amount') # 待还金额
+    repay_platform_order_no = fields.Char(string=_('Contract Number'), related='loan_order_id.repay_platform_order_no')
 
     # 减免
-    derate_amount = fields.Float('减免金额', related='loan_order_id.derate_amount')
+    derate_amount = fields.Float(_('Remission Amount'), related='loan_order_id.derate_amount')
 
     # 平账
     # settle_amount = fields.Float('平账金额', digits=(16, 2), compute='_compute_settle_amount')
@@ -87,180 +89,182 @@ class CollectionOrder(models.Model):
     # 展期订单
     # is_extension = fields.Boolean(string='是否展期订单', default=False)
     
-    extend_pay_amount = fields.Float('展期金额', digits=(16, 2) ,related="loan_order_id.extend_pay_amount")
-    apply_time = fields.Datetime(string='展期申请时间')
-    extend_success_time = fields.Datetime('展期结束时间(含)',related="loan_order_id.extend_success_time")
-    renewal_repayment_amount = fields.Float(string="申请展期需支付金额", digits=(16, 2))
-    add_renewal_no = fields.Integer(string="累计展期次数")    
+    extend_pay_amount = fields.Float(_('Extended Amount'), digits=(16, 2) ,related="loan_order_id.extend_pay_amount")
+    apply_time = fields.Datetime(string=_('Extension Application Time'))
+    extend_success_time = fields.Datetime(_('Extension end time'),related="loan_order_id.extend_success_time")
+    renewal_repayment_amount = fields.Float(string=_("Extension Fee"), digits=(16, 2))
+    add_renewal_no = fields.Integer(string=_("Total Number of Extensions"))
 
-    receivables_number = fields.Char(string='收款账号', related="loan_order_id.bank_account_no") 
+    receivables_number = fields.Char(string=_('Withdrawal Account'), related="loan_order_id.bank_account_no")
     #loan_movement_id = fields.Many2one("loan.movement",string="放款方式",related="loan_order_id.loan_movement_id",store=True,)
     #loan_movement_name = fields.Char(string="放款方式", related="loan_movement_id.name", store=True)
-    payment_way_id = fields.Many2one('payment.way',string='放款方式', related="loan_order_id.payment_way_id")
+    payment_way_id = fields.Many2one('payment.way',string=_('Loan type'), related="loan_order_id.payment_way_id")
 
-    repayment_capital = fields.Float(string="应还本金", digits=(16, 2) , related="loan_order_id.contract_amount")
+    repayment_capital = fields.Float(string=_("Due Repayment of Principal"), digits=(16, 2) , related="loan_order_id.contract_amount")
 
     loan_amount = fields.Float(
-        string="放款金额",
+        string=_("Loan Amount"),
         digits=(16, 2),
         related="loan_order_id.loan_amount",
     )
     
     loan_order_status_id = fields.Selection(
         selection=enums.ORDER_STATUS, 
-        string="财务订单状态",
+        string=_("Financial Order Status"),
         related="loan_order_id.order_status",
     )
 
     user_identity_id = fields.Many2one(
         "user.identity",
-        string="用户身份信息",
+        string=_("ID Information"),
         compute="_compute_user_identity_id",
         store=True,
     )
     
     gender_code_1 = fields.Integer(
-        related="user_identity_id.gender_code"
+        related="user_identity_id.gender_code", string=_("Gender")
     )
     gender_code = fields.Selection(
-        selection=enums.GENDER,string="性别", 
+        selection=enums.GENDER, string=_("Gender"),
         compute = "_compute_gender_code"
     )
     
     birth_date_1 = fields.Integer(
-        string="生日", 
+        string=_("Birthday"),
         related="user_identity_id.birth_date", 
     ) 
     birth_date = fields.Date(
-        string="生日", 
+        string=_("Birthday"),
         compute = "_compute_birth_date"
     )   
     
     occupation_code_1 = fields.Integer(
-        string="职业", 
+        string=_("Occupation"),
         related="user_identity_id.occupation_code", 
     )
     occupation_code = fields.Selection(
         selection=enums.OCCUPATION,
-        string="职业", 
+        string=_("Occupation"),
         compute = "_compute_occupation_code"
     )
     
     education_code_1 = fields.Integer(
-        string="学历", 
+        string=_("Education"),
         related="user_identity_id.education_code", 
     )
     education_code = fields.Selection(
         selection=enums.EDUCATION,
-        string="学历", 
+        string=_("Education"),
         compute = "_compute_education_code"
     )    
     marital_status_code_1 = fields.Integer(
-        string="婚姻状况", 
+        string=_("Marital Status"),
         related="user_identity_id.marital_status_code", 
     )
     marital_status_code = fields.Selection(
         selection=enums.MARITAL_STATUS,
-        string="婚姻状况", 
+        string=_("Marital Status"),
         compute = "_compute_marital_status_code",
     )    
     salary_code = fields.Integer(
-        string="月收入", related="user_identity_id.salary_code"
+        string=_("Monthly Income"), related="user_identity_id.salary_code"
     )
     housing_status_code_1 = fields.Integer(
-        string="居住状况", 
+        string=_("Residential Status"),
         related="user_identity_id.housing_status_code", 
     )
     housing_status_code = fields.Selection(
         selection=enums.HOUSE_STATUS,
-        string="居住状况", 
+        string=_("Residential Status"),
         compute = "_compute_housing_status_code", 
     )    
     children_num_code_1 = fields.Integer(
-        string="子女数量", 
+        string=_("Number of Children"),
         related="user_identity_id.children_num_code", 
     )
     children_num_code = fields.Selection(
         selection=enums.CHILDREN_COUNT,
-        string="子女数量", 
+        string=_("Number of Children"),
         compute = "_compute_children_num_code", 
     )    
     loan_purpose_code_1 = fields.Integer(
-        string="贷款用途", 
+        string=_("Loan Purpose"),
         related="user_identity_id.loan_purpose_code", 
     )
     loan_purpose_code = fields.Selection(
         selection=enums.LOAN_PURPOSE,
-        string="贷款用途", 
+        string=_("Loan Purpose"),
         compute = "_compute_loan_purpose_code", 
     )    
     pay_day_code = fields.Integer(
-        string="发薪日", related="user_identity_id.pay_day_code"
+        string=_("Payday"), related="user_identity_id.pay_day_code"
     )
 
     collection_user_contact_ids = fields.One2many(
         "collection.user.contact",
         "collection_order_id",
-        string="用户联系人信息"
+        string=_("Contact Information")
     ) 
 
-    is_relative = fields.Char(string="亲属号", compute="_compute_from_user_contact")
-    is_risk = fields.Char(string="风险号", compute="_compute_from_user_contact")
+    is_relative = fields.Char(string=_("Relative Number"), compute="_compute_from_user_contact")
+    is_risk = fields.Char(string=_("Risk Number"), compute="_compute_from_user_contact")
     
     user_address_book_ids = fields.One2many(
-        "collection.user.address.book", "collection_order_id", string="通讯录"
+        "collection.user.address.book", "collection_order_id", string=_("Address Book")
     )
     user_call_record_ids = fields.One2many(
-        "collection.user.call.record", "collection_order_id", string="通话记录"
+        "collection.user.call.record", "collection_order_id", string=_("Call records")
     )
     history_collection_record_ids = fields.One2many(
-        "history.collection.record", "collection_order_id", string="历史催收记录"
+        "history.collection.record", "collection_order_id",
+        string=_("Collection Record for This Order")
     )
     # history_loans_record_ids = fields.One2many(
     #     "history.loans.record", "collection_order_id", string="历史贷款记录"
     # )
     loan_order_ids = fields.One2many(
-        "loan.order", string="贷款记录", compute="_compute_loan_orders"
+        "loan.order", string=_("Loan Records"), compute="_compute_loan_orders"
     )
 
     user_photo_set_id = fields.Many2one(
         "user.photo.set",
-        string="用户证件照",
+        string=_("ID Photo"),
         compute="_compute_user_photo_set_id",
         store=True,
     )
 
-    pan_front_img_url = fields.Char(string="PAN卡正面照", related="user_photo_set_id.photo_url_1")
-    pan_back_img_url = fields.Char(string="PAN卡背面照", related="user_photo_set_id.photo_url_2")
-    id_front_img_url = fields.Char(string="ID卡正面照", related="user_photo_set_id.photo_url_3")
-    id_hand_img_url = fields.Char(string="ID卡手持照", related="user_photo_set_id.photo_url_4")    
-    pan_front_img = fields.Image(string="PAN卡正面照" ,compute = "_compute_pan_front_img")  
-    pan_back_img = fields.Image(string="PAN卡背面照", compute ="_compute_pan_back_img" )
-    id_front_img = fields.Image(string="ID卡正面照", compute ="_compute_id_front_img")
-    id_hand_img = fields.Image(string="ID卡手持照", compute="_compute_id_hand_img")
+    pan_front_img_url = fields.Char(string=_("Front side of the PAN card"), related="user_photo_set_id.photo_url_1")
+    pan_back_img_url = fields.Char(string=_("Back side of the PAN card"), related="user_photo_set_id.photo_url_2")
+    id_front_img_url = fields.Char(string=_("Front side photo of the ID card"), related="user_photo_set_id.photo_url_3")
+    id_hand_img_url = fields.Char(string=_("Handheld photo of the ID card"), related="user_photo_set_id.photo_url_4")
+    pan_front_img = fields.Image(string=_("Front side of the PAN card") ,compute = "_compute_pan_front_img")
+    pan_back_img = fields.Image(string=_("Back side of the PAN card"), compute ="_compute_pan_back_img" )
+    id_front_img = fields.Image(string=_("Front side photo of the ID card"), compute ="_compute_id_front_img")
+    id_hand_img = fields.Image(string=_("Handheld photo of the ID card"), compute="_compute_id_hand_img")
     
     user_action_living_rec_id = fields.Many2one(
         "user.action.living.rec",
-        string="活体识别照",
+        string=_("Face recognitional photo"),
         compute="_compute_user_action_living_rec_id",
         store=True,
     )    
-    body_discern_img_url = fields.Char(string="活体识别照", related="user_action_living_rec_id.snapshot_url")
-    body_discern_img = fields.Image(string="活体识别照", compute="_compute_body_discern_img") 
+    body_discern_img_url = fields.Char(string=_("Face recognitional photo"),
+                                       related="user_action_living_rec_id.snapshot_url")
+    body_discern_img = fields.Image(string=_("Face recognitional photo"), compute="_compute_body_discern_img")
     
     
     card_num = fields.Char(
-        string="证件号码",
+        string=_("ID Card Number"),
         related="user_photo_set_id.ocr_result_2"
     )  # todo 显示当前订单关联用户的身份证号码（APP-填资-活体&证照信息-PAN card Number）；
 
     # 待处理订单字段
     # collection_user_id = fields.Many2one("loan.user", string="催收对象")
     collector_id = fields.Many2one(
-        "res.users", domain=[("is_collection", "=", True)], string="催收员"
+        "res.users", domain=[("is_collection", "=", True)], string=_("Collector")
     )
     collector_name = fields.Char(
-        string="催收员姓名", related="collector_id.name", store=True
+        string=_("Collectors' Name"), related="collector_id.name", store=True
     )
 
     @api.depends("app_id")
@@ -338,10 +342,11 @@ class CollectionOrder(models.Model):
     
     @api.depends("collection_user_contact_ids.name")
     def _compute_from_user_contact(self):
+        total = "数量" if self.env.user.lang == "zh_CN" else "Total"
         for rec in self:
             contacts = rec.collection_user_contact_ids
-            rec.is_relative = f"aunt、uncle、friend; 数量：{len(contacts.filtered(lambda c: c.is_relative))}"
-            rec.is_risk = f"bank、loan; 数量: {len(contacts.filtered(lambda c: c.is_risk))}"
+            rec.is_relative = f"aunt、uncle、friend; {total}：{len(contacts.filtered(lambda c: c.is_relative))}"
+            rec.is_risk = f"bank、loan; {total}: {len(contacts.filtered(lambda c: c.is_risk))}"
 
     @api.depends("user_id","app_id")
     def _compute_collection_user_contact_ids(self):
@@ -463,7 +468,7 @@ class CollectionOrder(models.Model):
         return {
             "id": action_id.id,
             "type": "ir.actions.act_window",
-            "name": "待分配订单",
+            "name": "待分配订单" if self.env.user.lang == "zh_CN" else "Pending Assignation List",
             "res_model": self._name,
             "view_mode": "tree",
             "view_id": tree_view_id.id,
@@ -501,7 +506,7 @@ class CollectionOrder(models.Model):
         return {
             "id": action_id.id,
             "type": "ir.actions.act_window",
-            "name": "待处理订单",
+            "name": "待处理订单" if self.env.user.lang == "zh_CN" else "Pending Transaction List",
             "res_model": self._name,
             "view_mode": "tree",
             "views": [(tree_view_id.id, "list")],
@@ -531,7 +536,7 @@ class CollectionOrder(models.Model):
         return {
             "id": action_id.id,
             "type": "ir.actions.act_window",
-            "name": "处理中订单",
+            "name": "处理中订单" if self.env.user.lang == "zh_CN" else "List of Order In Process",
             "res_model": self._name,
             "view_mode": "tree",
             "views": [(tree_view_id.id, "list")],
@@ -547,7 +552,7 @@ class CollectionOrder(models.Model):
         """
         return {  
             'type': 'ir.actions.act_window',  
-            'name': '订单详情',  
+            'name': '订单详情' if self.env.user.lang == "zh_CN" else "Order details",
             'res_model': self._name,  
             'res_id': self.id,  # 当前记录的ID  
             'view_mode': 'form',  
@@ -560,7 +565,7 @@ class CollectionOrder(models.Model):
         列表点击跟进按钮  
         """  
         return {  
-            "name": "订单详情",  
+            "name": '订单详情' if self.env.user.lang == "zh_CN" else "Order details",
             "type": "ir.actions.act_window",  
             "res_model": self._name,  
             "res_id": self.id,  
@@ -574,7 +579,7 @@ class CollectionOrder(models.Model):
         """
         form_view_id = self.env.ref("loan_collection.collection_order_pending_form2")
         return {
-            "name": "放款凭证",
+            "name": "放款凭证" if self.env.user.lang == "zh_CN" else "Loan voucher",
             "type": "ir.actions.act_window",
             "res_model": self._name,
             "res_id": self.id,
@@ -600,7 +605,7 @@ class CollectionOrder(models.Model):
     def action_amount_deduction(self):
         """列表点击金额减免按钮"""
         return {
-            'name': '金额减免申请',
+            'name': '金额减免申请' if self.env.user.lang == "zh_CN" else "Application of Amount Remission",
             'type': 'ir.actions.act_window',
             'res_model': "derate.record",
             'view_mode': 'form',
@@ -622,16 +627,21 @@ class CollectionOrder(models.Model):
         return self.loan_order_id.action_show_additional_record()
 
     def action_manual_allocation(self):
+        lang = self.env.user.lang
         if len(self) == 0:
-            raise UserError('请先勾选需要手动分配的订单！')
+            msg = "请先勾选需要手动分配的订单！" if lang == "zh_CN" else \
+                "Please first check the orders that require manual allocation!"
+            raise UserError(msg)
         elif len(set(self.mapped('collection_stage'))) > 1:
-            raise UserError('请勾选相同“催收阶段”的订单，否则无法进行分配')
+            msg = "请勾选相同“催收阶段”的订单，否则无法进行分配" if lang == "zh_CN" else \
+                "Please select orders with the same 'collection stage', otherwise allocation cannot be made"
+            raise UserError(msg)
         else:
             form_view_id = self.env.ref("loan_collection.manual_allocation_wizard_form")
             collection_stage = self[0].collection_stage
             collection_stage_id = self[0].collection_stage_setting_id
             return {
-                "name": "手动分单",
+                "name": "手动分单" if lang == "zh_CN" else "Manual Assignation of Order",
                 "type": "ir.actions.act_window",
                 "res_model": "manual.allocation.wizard",
                 #'res_id': self.id,
@@ -654,7 +664,7 @@ class CollectionOrder(models.Model):
     def action_add_contact(self):
         form_view_id = self.env.ref("loan_collection.collection_user_contact_form")
         return {
-            "name": "添加联系人",
+            "name": "添加联系人" if self.env.user.lang == "zh_CN" else "Add Contact",
             "type": "ir.actions.act_window",
             "res_model": "collection.user.contact",
             "view_mode": "form",
@@ -710,9 +720,12 @@ class CollectionOrder(models.Model):
         1. 判断是否允许展期
         """
         if not self.loan_order_id._check_order_can_extension():
-            raise exceptions.UserError("该订单不符合展期条件，不能申请展期。")
+            msg = "该订单不符合展期条件，不能申请展期。" if self.env.user.lang == "zh_CN" else \
+                "This order does not meet the conditions for extension and cannot be applied for extension."
+            raise exceptions.UserError(msg)
         
-        extension_record = self.env['extension.record'].search([('order_id', '=', self.loan_order_id.id), ("status", "not in", ["5", "6"])], limit=1)
+        extension_record = self.env['extension.record'].search([('order_id', '=', self.loan_order_id.id),
+                                                                ("status", "not in", ["5", "6"])], limit=1)
         if not extension_record:
             extension_record = self.env['extension.record'].create({
                 'order_id': self.loan_order_id.id,
@@ -731,11 +744,11 @@ class CollectionUserContact(models.Model):
     _table = "C_user_contact"
     _description = "用户联系人信息"
 
-    sequence = fields.Integer(string="序号")
-    name = fields.Char(string="联系人姓名")
-    phone_no = fields.Char(string="电话号码")
-    collection_order_id = fields.Many2one("collection.order", string="催收订单")
-    can_edit = fields.Boolean(string="是否可编辑", default=True)
+    sequence = fields.Integer(string=_("Serial Number"))
+    name = fields.Char(string=_("Contact Name"))
+    phone_no = fields.Char(string=_("Telephone Number"))
+    collection_order_id = fields.Many2one("collection.order", string=_("Collection Order"))
+    can_edit = fields.Boolean(string=_("Is Editable"), default=True)
     relation_selection = fields.Selection(
         [
             ("Father", "Father"),
@@ -748,13 +761,13 @@ class CollectionUserContact(models.Model):
             ("Others", "Others"),
             ("oneself", "本人"),
         ],
-        string="关系",
+        string=_("Relationship"),
     )
-    add_user_id = fields.Many2one("res.users", string="操作人")
-    add_date = fields.Datetime(string="补充时间")
+    add_user_id = fields.Many2one("res.users", string=_("Operator"))
+    add_date = fields.Datetime(string=_("Creation Time"))
 
-    is_relative = fields.Boolean(string="是否为亲属号", compute="_compute_from_name")
-    is_risk = fields.Boolean(string="是否为风险号", compute="_compute_from_name")
+    is_relative = fields.Boolean(string=_("Is Relative Number"), compute="_compute_from_name")
+    is_risk = fields.Boolean(string=_("Is Risk Numbe"), compute="_compute_from_name")
     
     @api.depends("name")
     def _compute_from_name(self):
@@ -782,11 +795,11 @@ class CollectionUserAddressBook(models.Model):
     _table = "C_user_address_book"
     _description = "用户通讯录"
 
-    collection_order_id = fields.Many2one("collection.order", string="催收订单")
-    order_no = fields.Char(string='订单号', index=True)
-    sequence = fields.Integer(string="序号", compute="_compute_sequence", store=True)
-    name = fields.Char(string="姓名")
-    phone_no = fields.Char(string="电话")
+    collection_order_id = fields.Many2one("collection.order", string=_("Collection Order"))
+    order_no = fields.Char(string=_('Order ID'), index=True)
+    sequence = fields.Integer(string=_("Serial Number"), compute="_compute_sequence", store=True)
+    name = fields.Char(string=_("Name"))
+    phone_no = fields.Char(string=_("Telephone Number"))
     active = fields.Boolean(default=True)
 
 
@@ -804,18 +817,18 @@ class UserCallRecord(models.Model):
     _table = "C_user_call_record"
     _description = "通话记录"
 
-    collection_order_id = fields.Many2one("collection.order", string="催收订单")
-    order_no = fields.Char(string='订单号', index=True)
-    name = fields.Char(string="姓名")
-    phone_no = fields.Char(string="电话")
-    sequence = fields.Integer(string="序号", compute="_compute_sequence", store=True)
+    collection_order_id = fields.Many2one("collection.order", string=_("Collection Order"))
+    order_no = fields.Char(string=_('Order ID'), index=True)
+    name = fields.Char(string=_("Name"))
+    phone_no = fields.Char(string=_("Telephone Number"))
+    sequence = fields.Integer(string=_("Serial Number"), compute="_compute_sequence", store=True)
     call_type = fields.Selection(
-        [("send", "发送"), ("receive", "接收"), ("unreceived", "未接")],
-        string="通话类型",
+        [("send", _("Send")), ("receive", _("Receive")), ("unreceived", _("Unreceived"))],
+        string=_("Call Type"),
     )
-    call_time = fields.Datetime(string="通话时间")
-    total_call_times = fields.Integer(string="通话总次数")
-    total_call_duration = fields.Integer(string="通话总时长(m)")
+    call_time = fields.Datetime(string=_("Call Time"))
+    total_call_times = fields.Integer(string=_("Call Count"))
+    total_call_duration = fields.Integer(string=_("Contact Duration(m)"))
     active = fields.Boolean(default=True)
 
     @api.depends("collection_order_id")
@@ -832,9 +845,9 @@ class HistoryCollectionRecord(models.Model):
     _table = "C_history_collection_record"
     _description = "历史催收记录"
 
-    collection_order_id = fields.Many2one("collection.order", string="催收订单")
-    sequence = fields.Integer(string="序号", compute="_compute_sequence", store=True)
-    user_id = fields.Many2one("collection.user.contact", string="催收对象")
+    collection_order_id = fields.Many2one("collection.order", string=_("Collection Order"))
+    sequence = fields.Integer(string=_("Serial Number"), compute="_compute_sequence", store=True)
+    user_id = fields.Many2one("collection.user.contact", string=_("Collection Target"))
     relation_selection = fields.Selection(
         [
             ("Father", "Father"),
@@ -847,10 +860,10 @@ class HistoryCollectionRecord(models.Model):
             ("Others", "Others"),
             ("oneself", "本人"),
         ],
-        string="与本人关系",
+        string=_("Relationship with the individual"),
         related="user_id.relation_selection",
     )
-    phone_no = fields.Char(string="跟踪电话", related="user_id.phone_no")
+    phone_no = fields.Char(string=_("Follow-up Call"), related="user_id.phone_no")
     collection_type = fields.Selection(
         [
             ("phone", "电话催收"),
@@ -859,7 +872,7 @@ class HistoryCollectionRecord(models.Model):
             ("customer_service", "客服进线"),
             ("other", "其他"),
         ],
-        string="催收形式",
+        string=_("Collection Method"),
     )
     contact_result = fields.Selection(
         [
@@ -881,17 +894,17 @@ class HistoryCollectionRecord(models.Model):
             ("空号", "空号"),
             ("其他", "其他"),
         ],
-        string="联络结果",
+        string=_("Contact Result"),
     )
-    remark = fields.Char(string="备注")
-    file_ids = fields.Many2many("ir.attachment", string="附件图片")
-    collector_id = fields.Many2one("res.users", string="催收员")
+    remark = fields.Char(string=_("Remark"))
+    file_ids = fields.Many2many("ir.attachment", string=_("Attachment Image"))
+    collector_id = fields.Many2one("res.users", string=_("Collector"))
     collection_stage = fields.Char(
-        string="催收阶段",
+        string=_("Collection Stage"),
         related="collection_order_id.collection_stage",
         store=True,
     )
-    overdue_days = fields.Integer(string='逾期天数', related="collection_order_id.overdue_days",store=True,)
+    overdue_days = fields.Integer(string=_('Overdue Days'), related="collection_order_id.overdue_days",store=True,)
     
 
     @api.depends("collection_order_id")
@@ -917,38 +930,40 @@ class HistoryLoansRecord(models.Model):
     _table = "C_history_loans_record"
     _description = "历史贷款记录"
 
-    collection_order_id = fields.Many2one("collection.order", string="催收订单")
-    sequence = fields.Integer(string="序号", compute="_compute_sequence", store=True)
-    loan_order_id = fields.Many2one("loan.order", string="关联订单")
-    order_no = fields.Char(string="订单编号", related="loan_order_id.order_no", store=True)
+    collection_order_id = fields.Many2one("collection.order", string=_("Collection Order"))
+    sequence = fields.Integer(string=_("Serial Number"), compute="_compute_sequence", store=True)
+    loan_order_id = fields.Many2one("loan.order", string=_("Associated Orders"))
+    order_no = fields.Char(string=_("Order ID"), related="loan_order_id.order_no", store=True)
     contract_amount = fields.Float(
-        string="合同金额", related="loan_order_id.contract_amount"
+        string=_("Contract Amount"), related="loan_order_id.contract_amount"
     )
     borrow_money_date = fields.Integer(
-        string="借款期限(天)", related="loan_order_id.loan_period", store=True
+        string=_("Borrowing cycle（Days)"), related="loan_order_id.loan_period", store=True
     )
     application_time = fields.Datetime(
-        string="申请时间", related="loan_order_id.apply_time", store=True
+        string=_("Application Date"), related="loan_order_id.apply_time", store=True
     )
     product_id = fields.Many2one('loan.product',
-        string="产品名称", index=True, related="loan_order_id.product_id"
+        string=_("Product Name"), index=True, related="loan_order_id.product_id"
     )
     app_id = fields.Many2one(
-        "loan.app", string="App", related="loan_order_id.app_id", store=True
+        "loan.app", string=_("App"), related="loan_order_id.app_id", store=True
     )
-    app_name = fields.Char(string="APP名称", related="app_id.app_name", store=True)
-    loan_order_status_id = fields.Selection(selection=enums.ORDER_STATUS, default='1', string='财务订单状态')
+    app_name = fields.Char(string=_("APP name"), related="app_id.app_name", store=True)
+    loan_order_status_id = fields.Selection(selection=enums.ORDER_STATUS, default='1',
+                                            string=_('Financial Order Status'))
     
-    credit_examiner = fields.Many2one("res.users", string="信审员")
-    credit_audit_reason = fields.Char(string="信审原因")
+    credit_examiner = fields.Many2one("res.users", string=_("Auditor"))
+    credit_audit_reason = fields.Char(string=_("Credit Review Reason"))
     collection_stage = fields.Char(
-        string="催收阶段",
+        string=_("Collection Stage"),
         related="collection_order_id.collection_stage",
         store=True,
     )
-    overdue_days = fields.Integer(string='逾期天数', related="collection_order_id.overdue_days",store=True,)    
-    collector_id = fields.Many2one("res.users", string="催收员",related="collection_order_id.collector_id",)
-    remark = fields.Char(string="备注")
+    overdue_days = fields.Integer(string=_('Overdue Days'), related="collection_order_id.overdue_days",store=True,)
+    collector_id = fields.Many2one("res.users", string=_("Collector"),
+                                   related="collection_order_id.collector_id",)
+    remark = fields.Char(string=_("Remark"))
 
     @api.depends("collection_order_id")
     def _compute_sequence(self):
@@ -964,7 +979,7 @@ class CollectionAutoAssignOrders(models.Model):
     _table = 'C_auto_assign_orders'
     _description = '自动分单'
 
-    auto_assign_orders = fields.Boolean(string='自动分单', default=False)
+    auto_assign_orders = fields.Boolean(string=_('Automatic Assignation of Order'), default=False)
 
     def cron_auto_assign_orders(self):
         _logger.info("开始系统自动分单......")

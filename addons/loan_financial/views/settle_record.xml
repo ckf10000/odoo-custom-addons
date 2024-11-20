@@ -6,16 +6,16 @@
         <field name="model">repay.order</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0" default_order="order_id">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="order_user_phone" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="repay_date" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="order_unpaid_contract_amount" string="合同金额" optional="show" width="150px"/>
-                <field name="order_unpaid_overdue_fee" string="罚息" optional="show" width="150px"/>
-                <field name="order_unpaid_late_fee" string="滞纳金" optional="show" width="150px"/>
-                <field name="pending_amount" optional="show" width="150px"/>
-                <field name="order_settle_amount" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="order_user_phone" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="repay_date" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="order_unpaid_contract_amount" string="合同金额" optional="show" />
+                <field name="order_unpaid_overdue_fee" string="罚息" optional="show" />
+                <field name="order_unpaid_late_fee" string="滞纳金" optional="show" />
+                <field name="pending_amount" optional="show" />
+                <field name="order_settle_amount" optional="show" />
                 <button name="action_show_settle_wizard" type="object" string="平账"/>
             </tree>
         </field>
@@ -39,24 +39,24 @@
         <field name="model">settle.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="loan_user_phone" optional="show" width="150px"/>
-                <field name="product_id" string="产品名称" optional="show" width="150px"/>
-                <field name="loan_uid" optional="show" width="150px"/>
-                <field name="loan_user_name" optional="show" width="150px"/>
-                <field name="order_apply_time" optional="show" width="150px"/>
-                <field name="settle_time" optional="show" width="150px"/>
-                <field name="settle_type" optional="show" width="150px"/>
-                <field name="order_contract_amount" optional="show" width="150px"/>
-                <field name="order_pending_amount" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="loan_user_phone" optional="show" />
+                <field name="product_id" string="产品名称" optional="show" />
+                <field name="loan_uid" optional="show" />
+                <field name="loan_user_name" optional="show" />
+                <field name="order_apply_time" optional="show" />
+                <field name="settle_time" optional="show" />
+                <field name="settle_type" optional="show" />
+                <field name="order_contract_amount" optional="show" />
+                <field name="order_pending_amount" optional="show" />
 
-                <field name="amount" optional="show" width="150px"/>
-                <field name="overdue_amount" optional="show" width="150px"/>
-                <field name="settle_contract_amount" optional="show" width="150px"/>
-                <field name="settle_overdue_amount" optional="show" width="150px"/>
-                <field name="settle_late_fee" optional="show" width="150px"/>
-                <field name="settle_user_id" optional="show" width="150px"/>
-                <field name="remark" optional="show" width="150px"/> 
+                <field name="amount" optional="show" />
+                <field name="overdue_amount" optional="show" />
+                <field name="settle_contract_amount" optional="show" />
+                <field name="settle_overdue_amount" optional="show" />
+                <field name="settle_late_fee" optional="show" />
+                <field name="settle_user_id" optional="show" />
+                <field name="remark" optional="show" /> 
             </tree>
         </field>
     </record>

@@ -1,7 +1,9 @@
 import logging
+import datetime, pytz
 from typing import Dict, List
 from odoo import models, fields, api
 from . import enums
+from ..utils import pay_utils
 
 
 _logger = logging.getLogger(__name__)
@@ -23,6 +25,83 @@ class PaymentChannel(models.Model):
     redirect_url = fields.Char(string='跳转地址')
     sequence = fields.Integer(string='排序', default=99)
     payment_way_ids = fields.Many2many('payment.way', 'payment_channel_way_rel', 'cid', 'wid', string='支付方式')
+
+    def call_pay_order(self, amount, loan_order, device="pc"):
+        """
+        调用代收接口
+        """
+        self.ensure_one()
+        trade_no = self.env['ir.sequence'].sudo().next_by_code('trade_record_no_seq')
+
+        if self.enum_code == 1:
+            data = {
+                'merchantNo': self.merchant_no,
+                'key': self.merchant_key,
+                'orderNo': trade_no,
+                'amount': str(amount),
+                'notifyUrl': self.call_back_url or '',
+                'userName': loan_order.loan_user_name,
+                'timestamp': datetime.datetime.now().astimezone(tz=pytz.timezone( 'Asia/Kolkata' )).strftime('%Y-%m-%d %H:%M:%S'),
+            } 
+            res = pay_utils.sf_pay.create_pay_order(data)
+            pay_url = res.get('url', '')
+            platform_order_no = res.get('platformOrderNo', '')
+        else:
+            data = {
+                'mchId': int(self.merchant_no),
+                'key': self.merchant_key,
+                'mchOrderNo': trade_no,
+                'orderAmount': int(amount * 100),
+                'notifyUrl': self.call_back_url or '',
+                'returnUrl': self.redirect_url or '',
+                'device': device,
+                'uid': loan_order.loan_uid,
+                'customerName': loan_order.loan_user_name,
+                'tel': loan_order.loan_user_phone
+            }
+            res = pay_utils.coin_pay.create_pay_order(data)
+            pay_url = res.get('data', {}).get('payUrl')
+            platform_order_no = res.get('data', {}).get('payOrderId', '')
+            
+        trade_data = {
+            'order_id': loan_order.id,
+            'payment_setting_id': loan_order.repayment_setting_id.id,
+            'payment_way_id': loan_order.repayment_way_id.id,
+            'trade_no': trade_no,
+            'platform_order_no': platform_order_no,
+            'trade_amount': amount,
+            'trade_status': '1' if res.get('code', 999) == 200 else '3',
+            'trade_type': '1',
+            'trade_start_time': fields.Datetime.now(),
+            'trade_data': res,
+        }
+        return trade_data, pay_url
+    
+    def call_supplement_order(self, utr, trade_no):
+        """
+        调用补单接口
+        """
+        is_success = False
+        if self.enum_code == 1:
+            data = pay_utils.sf_pay.create_supplement_order({
+                "merchantNo": self.merchant_no,
+                'key': self.merchant_key,
+                "orderNo": trade_no,
+                "utr": utr,
+                "timestamp": datetime.datetime.now().astimezone(tz=pytz.timezone( 'Asia/Kolkata' )).strftime('%Y-%m-%d %H:%M:%S'),
+            })
+            if data.get('code') == 0 and data.get('budanResult') == "succ":
+                is_success = True
+        else:
+            data = pay_utils.coin_pay.create_supplement_order({
+                'mchId': self.merchant_no,
+                'key': self.merchant_key,
+                'mchOrderNo': trade_no,
+                'utr': utr
+            })
+            if data['code'] == 200:
+                is_success = True
+        return is_success, data
         
     def action_fee_setting(self):
         use_type = self.env.context.get('use_type')
@@ -244,7 +323,6 @@ class PaymentSettingTradeRecord(models.Model):
         res_record = self.env[self.res_model].sudo().browse(self.res_id)
         if self.trade_status == '2':
             res_record.after_payment(self)
-
 
 
 class PaymentChannelFeeWizard(models.TransientModel):

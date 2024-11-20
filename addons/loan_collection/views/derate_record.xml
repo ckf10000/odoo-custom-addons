@@ -31,22 +31,22 @@
                         <button name="action_col_derate_batch_approval" type="object" string="批量审核" class="oe_highlight" display="always"/>
                         <button name="action_col_derate_setting" type="object" string="自动审核配置" display="always"/>
                     </header>
-                    <field name="derate_no" optional="show" width="150px"/>
-                    <field name="order_id" optional="show" width="150px"/>
-                    <field name="loan_uid" optional="show" width="150px"/>
-                    <field name="loan_user_name" optional="show" width="150px"/>
-                    <field name="loan_user_phone" optional="show" width="150px"/>
-                    <field name="order_apply_time" optional="show" width="150px"/>
-                    <field name="derate_amount" optional="show" width="150px"/>
-                    <field name="order_pending_amount" optional="show" width="150px"/>
-                    <field name="collection_stage_setting_id" optional="show" width="150px"/>
-                    <field name="derate_type" optional="show" width="150px"/>
-                    <field name="apply_user_id" optional="show" width="150px"/>
-                    <field name="valid_time" string='有效期' optional="show" width="150px"/>
-                    <field name="apply_reason" optional="show" width="150px"/>
-                    <field name="product_id" optional="show" width="150px"/>
-                    <field name="app_id" optional="show" width="150px"/>
-                    <field name="app_version" optional="show" width="150px"/>
+                    <field name="derate_no" optional="show" />
+                    <field name="order_id" optional="show" />
+                    <field name="loan_uid" optional="show" />
+                    <field name="loan_user_name" optional="show" />
+                    <field name="loan_user_phone" optional="show" />
+                    <field name="order_apply_time" optional="show" />
+                    <field name="derate_amount" optional="show" />
+                    <field name="order_pending_amount" optional="show" />
+                    <field name="collection_stage_setting_id" optional="show" />
+                    <field name="derate_type" optional="show" />
+                    <field name="apply_user_id" optional="show" />
+                    <field name="valid_time" string='有效期' optional="show" />
+                    <field name="apply_reason" optional="show" />
+                    <field name="product_id" optional="show" />
+                    <field name="app_id" optional="show" />
+                    <field name="app_version" optional="show" />
                     <button name="action_show_col_approval" type="object" string="通过" context="{'flag': 1}"/>
                     <button name="action_show_col_approval" type="object" string="拒绝" context="{'flag': 0}"/>
                 </tree>
@@ -73,27 +73,27 @@
             <field name="model">derate.record</field>
             <field name="arch" type="xml">
                 <tree create='0' import="0" export_xlsx="0" default_order="col_approval_time desc">
-                    <field name="derate_no" optional="show" width="150px"/>
-                    <field name="order_id" optional="show" width="150px"/>
-                    <field name="loan_uid" optional="show" width="150px"/>
-                    <field name="loan_user_name" optional="show" width="150px"/>
-                    <field name="loan_user_phone" optional="show" width="150px"/>
-                    <field name="product_id" optional="show" width="150px"/>
-                    <field name="order_apply_time" optional="show" width="150px"/>
-                    <field name="derate_amount" optional="show" width="150px"/>
-                    <field name="derate_type" optional="show" width="150px"/>
-                    <field name="collection_stage_setting_id" optional="show" width="150px"/>
-                    <field name="apply_user_id" optional="show" width="150px"/>
-                    <field name="apply_reason" optional="show" width="150px"/>
-                    <field name="valid_time" optional="show" width="150px"/>
+                    <field name="derate_no" optional="show" />
+                    <field name="order_id" optional="show" />
+                    <field name="loan_uid" optional="show" />
+                    <field name="loan_user_name" optional="show" />
+                    <field name="loan_user_phone" optional="show" />
+                    <field name="product_id" optional="show" />
+                    <field name="order_apply_time" optional="show" />
+                    <field name="derate_amount" optional="show" />
+                    <field name="derate_type" optional="show" />
+                    <field name="collection_stage_setting_id" optional="show" />
+                    <field name="apply_user_id" optional="show" />
+                    <field name="apply_reason" optional="show" />
+                    <field name="valid_time" optional="show" />
 
-                    <field name="col_approval_time" optional="show" width="150px"/>
-                    <field name="col_approval_user_id" optional="hide" width="150px"/>
-                    <field name="fin_approval_time" optional="show" width="150px"/>
-                    <field name="fin_approval_user_id" optional="show" width="150px"/>
-                    <field name="fin_approval_status" string="审核结果" optional="show" width="150px"/>
-                    <field name="col_approval_remark" optional="show" width="150px"/>
-                    <field name="fin_approval_remark" optional="show" width="150px"/>
+                    <field name="col_approval_time" optional="show" />
+                    <field name="col_approval_user_id" optional="hide" />
+                    <field name="fin_approval_time" optional="show" />
+                    <field name="fin_approval_user_id" optional="show" />
+                    <field name="fin_approval_status" string="审核结果" optional="show" />
+                    <field name="col_approval_remark" optional="show" />
+                    <field name="fin_approval_remark" optional="show" />
                 </tree>
             </field>
         </record>

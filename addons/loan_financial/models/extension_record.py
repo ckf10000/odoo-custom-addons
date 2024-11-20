@@ -296,7 +296,7 @@ class ExtensionRecord(models.Model):
             } 
             res = pay_utils.sf_pay.create_pay_order(data)
             pay_url = res.get('url', "")
-            platform_order_no = res.get('data', {}).get('platformOrderNo', "")
+            platform_order_no = res.get('platformOrderNo', "")
 
         # 创建交易记录
         trade_data = {

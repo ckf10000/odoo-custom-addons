@@ -31,22 +31,22 @@
         <field name="model">additional.record</field>
         <field name="arch" type="xml">
             <tree create='0' import="0" export_xlsx="0">
-                <field name="order_no" optional="show" width="150px"/>
-                <field name="is_process" optional="show" width="150px"/>
-                <field name="order_user_id" optional="show" width="150px"/>
-                <field name="addition_type" optional="show" width="150px"/>
-                <field name="product_id" optional="show" width="150px"/>
-                <field name="order_user_name" optional="show" width="150px"/>
-                <field name="order_user_phone" optional="show" width="150px"/>
-                <field name="apply_time" optional="show" string="补单时间" width="150px"/>
-                <field name="utr" optional="show" width="150px"/>
-                <field name="amount" optional="show" width="150px"/>
+                <field name="order_no" optional="show" />
+                <field name="is_process" optional="show" />
+                <field name="order_user_id" optional="show" />
+                <field name="addition_type" optional="show" />
+                <field name="product_id" optional="show" />
+                <field name="order_user_name" optional="show" />
+                <field name="order_user_phone" optional="show" />
+                <field name="apply_time" optional="show" string="补单时间" />
+                <field name="utr" optional="show" />
+                <field name="amount" optional="show" />
                 <field name="attachment_id" widget="btn_field" />
-                <field name="status" optional="show" width="150px"/>
-                <field name="approval_user_id" optional="show" width="150px"/>
-                <field name="platform_order_no" optional="show" width="150px"/>
-                <field name="apply_user_id" optional="show" width="150px"/>
-                <field name="close_reason" optional="show" width="150px"/>
+                <field name="status" optional="show" />
+                <field name="approval_user_id" optional="show" />
+                <field name="platform_order_no" optional="show" />
+                <field name="apply_user_id" optional="show" />
+                <field name="close_reason" optional="show" />
                 
                 <button name="action_show_additional_record" type="object" string="补单" invisible="status in ['2', '3']"/>
                 <button name="action_show_update_payment_setting" type="object" string="通过" invisible="status != '1'"/>

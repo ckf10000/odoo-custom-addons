@@ -1,5 +1,5 @@
 import logging
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 from datetime import datetime, date
 from odoo.exceptions import ValidationError
 
@@ -8,28 +8,32 @@ class CollectionStageSetting(models.Model):
     _name = 'collection.stage.setting'
     _inherit = ['loan.basic.model']
     _table = 'C_stage_setting'
-    _description = '催收阶段配置'
+    _description = _('Collection Phase Configuration')
     _sql_constraints = [
-        ('collection_stage_uniq', 'unique(collection_stage)', '催收阶段名称已使用，请调整'),
-        ('check_number_of_min_day', 'CHECK(min_day >= -7)', '预期天数下限值为-7'),
-        ('check_number_of_max_day', 'CHECK(max_day <= 999)', '预期天数上限值为999'),
+        ('collection_stage_uniq', 'unique(collection_stage)',
+         _('The collection phase name is already in use, please adjust')),
+        ('check_number_of_min_day', 'CHECK(min_day >= -7)', _('The minimum number of overdue days is -7')),
+        ('check_number_of_max_day', 'CHECK(max_day <= 999)', _('The maximum number of overdue days is 999')),
     ]
     _rec_name = 'collection_stage'
 
-    collection_stage = fields.Char(string='催收阶段')
-    overdue_days = fields.Char(string='逾期天数', compute='compute_overdue_days', store=True)
-    min_day = fields.Integer(string='逾期天数min')
-    max_day = fields.Integer(string='逾期天数max', default=999)
-    status = fields.Boolean(string='状态', default=True)
-    status_select = fields.Selection([('active', '开启'), ('stop', '关闭')], string='状态', compute='compute_status_select', store=True)
-    history_ids = fields.One2many('collection.stage.setting.history', 'collection_stage_setting_id', string='历史记录')
-    write_date = fields.Datetime(string='最近编辑时间', timezone='Asia/Kolkata')
+    collection_stage = fields.Char(string=_('Collection Stage'))
+    overdue_days = fields.Char(string=_('Overdue Days'), compute='compute_overdue_days', store=True)
+    min_day = fields.Integer(string=_('Minimum Overdue Days'))
+    max_day = fields.Integer(string=_('Maximum Overdue Days'), default=999)
+    status = fields.Boolean(string=_('Status'), default=True)
+    status_select = fields.Selection([('active', _('Open')), ('stop', _('Close'))],
+                                     string=_('Status'), compute='compute_status_select', store=True)
+    history_ids = fields.One2many('collection.stage.setting.history', 'collection_stage_setting_id',
+                                  string=_('History Record'))
+    write_date = fields.Datetime(string=_('Last Edited Time'), timezone='Asia/Kolkata')
     
     @api.depends('min_day', 'max_day')
     def compute_overdue_days(self):
         """拼接逾期天数范围"""
+        days = "天" if self.env.user.lang == "zh_CN" else " Days"
         for record in self:
-            record.overdue_days = str(record.min_day) + '~' + str(record.max_day) + '天'
+            record.overdue_days = str(record.min_day) + '~' + str(record.max_day) + days
 
     @api.depends('status')
     def compute_status_select(self):
@@ -47,7 +51,7 @@ class CollectionStageSetting(models.Model):
         return {
             'id': action_id.id,
             'type': 'ir.actions.act_window',
-            'name': '催收阶段配置',
+            'name': "催收阶段配置" if self.env.user.lang == "zh_CN" else 'Collection Phase Configuration',
             'res_model': self._name,
             'view_mode': 'tree',
             'views': [(tree_view_id.id, 'list')],
@@ -62,7 +66,7 @@ class CollectionStageSetting(models.Model):
         """
         form_view_id = self.env.ref('loan_collection.collection_stage_setting_form')
         return {
-            'name': '编辑',
+            'name': "编辑" if self.env.user.lang == "zh_CN" else 'Edit',
             'type': 'ir.actions.act_window',
             'res_model': self._name,
             'res_id': self.id,
@@ -78,7 +82,7 @@ class CollectionStageSetting(models.Model):
         """
         form_view_id = self.env.ref('loan_collection.collection_stage_setting_wizard_delete_form')
         return {
-            'name': '编辑',
+            'name': "删除" if self.env.user.lang == "zh_CN" else 'Delete',
             'type': 'ir.actions.act_window',
             'res_model': 'collection.stage.setting.wizard',
             'view_mode': 'form',
@@ -94,7 +98,7 @@ class CollectionStageSetting(models.Model):
         tree_view_id = self.env.ref('loan_collection.collection_stage_setting_history_list')
         search_view_id = self.env.ref('loan_collection.collection_stage_setting_history_search')
         return {
-            'name': '历史记录',
+            'name': "历史记录" if self.env.user.lang == "zh_CN" else 'History Record',
             'type': 'ir.actions.act_window',
             'res_model': 'collection.stage.setting.history',
             'view_mode': 'tree',
@@ -143,7 +147,9 @@ class CollectionStageSetting(models.Model):
     @api.constrains('min_day', 'max_day')
     def _check_min_max_day(self):
         if self.min_day > self.max_day:
-            raise ValidationError('逾期天数下限值不能大于逾期天数上限值')
+            msg = "逾期天数下限值不能大于逾期天数上限值" if self.env.user.lang == "zh_CN" else \
+                "The lower limit of overdue days cannot exceed the upper limit of overdue days"
+            raise ValidationError(msg)
 
     # endregion
 
@@ -345,12 +351,12 @@ class CollectionStageSettingHistory(models.Model):
     _inherit = ['loan.basic.model']
     _description = '催收阶段配置-历史记录'
 
-    collection_stage_setting_id = fields.Many2one('collection.stage.setting', string='催收阶段配置')
-    collection_stage = fields.Char(string='催收阶段')
-    overdue_days = fields.Char(string='逾期天数')
-    min_day = fields.Integer(string='逾期天数min')
-    max_day = fields.Integer(string='逾期天数max')
-    status = fields.Boolean(string='状态')
-    status_select = fields.Selection([('active', '开启'), ('stop', '关闭')], string='状态')
-    edit_date = fields.Datetime(string='编辑时间')
-    edit_user_id = fields.Many2one('res.users', string='操作人')
+    collection_stage_setting_id = fields.Many2one('collection.stage.setting', string=_('Collection Phase Configuration'))
+    collection_stage = fields.Char(string=_('Collection Stage'))
+    overdue_days = fields.Char(string=_('Overdue Days'))
+    min_day = fields.Integer(string=_('Minimum Overdue Days'))
+    max_day = fields.Integer(string=_('Maximum Overdue Days'))
+    status = fields.Boolean(string=_('Status'))
+    status_select = fields.Selection([('active', _('Open')), ('stop', _('Close'))], string=_('Status'))
+    edit_date = fields.Datetime(string=_('Edited Time'))
+    edit_user_id = fields.Many2one('res.users', string=_('Operator'))

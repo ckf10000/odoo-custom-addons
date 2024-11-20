@@ -2,7 +2,7 @@
 <templates xml:space="preserve">
     <t t-inherit="web.ListRenderer" t-inherit-mode="extension">
         <xpath expr="//th[@t-else='']" position="inside">
-            <span>操作</span>
+            <span>Operate</span>
         </xpath>
     </t>
 </templates>
