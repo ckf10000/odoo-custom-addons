@@ -87,6 +87,7 @@ class LoanBill(models.Model):
     interest_fee = fields.Float('利息费')
     risk_score = fields.Float('风控评分')
     risk_score_send_time = fields.Integer('风控评分发送时间')
+    repayed_amount = fields.Float('已还金额')
 
 
     

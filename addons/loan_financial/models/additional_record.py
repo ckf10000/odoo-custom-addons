@@ -91,7 +91,7 @@ class AdditionalRecord(models.Model):
 
     def action_show_additional_record(self):
         return {
-            'name': '补单记录',
+            'name': '补单记录' if self.env.user.lang == "zh_CN" else "Reorder Record",
             'type': 'ir.actions.act_window',
             'res_model': "repay.order",
             'res_id': self.repay_order_id.id,
@@ -119,71 +119,6 @@ class AdditionalRecord(models.Model):
             }
         }
     
-    def call_pay_handler(self):
-        """
-        调用补单接口
-        """
-        trade_no = self.env['ir.sequence'].next_by_code('trade_record_no_seq')
-        now = fields.Datetime.now()
-
-        payment_channel_id = self.payment_setting_id.payment_channel_id
-        trade_status = "3"
-        if payment_channel_id.enum_code == 1:
-            data = pay_utils.sf_pay.create_supplement_order({
-                "merchantNo": payment_channel_id.merchant_no,
-                'key': payment_channel_id.merchant_key,
-                "orderNo": trade_no,
-                "utr": self.utr,
-                "timestamp": datetime.datetime.now().astimezone(tz=pytz.timezone( 'Asia/Kolkata' )).strftime('%Y-%m-%d %H:%M:%S'),
-            })
-            if data.get('code') == 0 and data.get('budanResult') == "succ":
-                trade_status = "2"
-            
-        else:
-            data = pay_utils.coin_pay.create_supplement_order({
-                'mchId': int(payment_channel_id.merchant_no),
-                'key': payment_channel_id.merchant_key,
-                'mchOrderNo': trade_no,
-                'utr': self.utr
-            })
-            if data['code'] == 200:
-                trade_status = "2"
-
-        # 创建交易记录
-        trade_data = {
-            'order_id': self.order_id.id,
-            'payment_setting_id': self.payment_setting_id.id,
-            # 'payment_way_id': self.order_id.repayment_way_id.id,
-            'trade_amount': self.amount,
-            'trade_no': trade_no,
-            'trade_status': trade_status,
-            'trade_type': '1',
-            'trade_start_time': now,
-            'trade_end_time': now,
-            'platform_order_no': "",
-            'trade_data': data,
-            'res_model': self._name,
-            'res_id': self.id
-        }
-        trade_record = self.env['payment.setting.trade.record'].create(trade_data)
-
-        self.write({
-            "platform_order_no": trade_no,
-            "merchant_order_no": trade_no
-        })
-        if trade_record.trade_status == "3":
-            return
-        
-        self.write({
-            "status": "3",
-            "update_time": now
-        })
-        
-        if self.addition_type == '1':
-            self.repay_order_id.after_payment(trade_record)
-        else:
-            self.env["extension.record"].update_or_create_from_additional(trade_record)
-
     def action_approval_pass(self):
         """
         审核通过

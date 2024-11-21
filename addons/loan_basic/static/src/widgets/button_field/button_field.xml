@@ -2,7 +2,7 @@
 <templates id="template" xml:space="preserve">
 
     <t t-name="ButtonField">
-        <button class="btn btn-link" t-on-click="onClick">查看</button>
+        <button class="btn btn-link" t-on-click="onClick">Check</button>
     </t>
 
 </templates>

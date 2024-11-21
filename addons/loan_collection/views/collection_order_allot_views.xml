@@ -238,17 +238,17 @@
                                     <field name="loan_order_ids" readonly="1">  
                                         <tree>  
                                             <!-- <field name="sequence" string="序号"/>   -->
-                                            <field name="order_no"/>
-                                            <field name="product_id" />  
-                                            <field name="contract_amount"/>  
-                                            <field name="loan_period" />  
-                                            <field name="pending_amount" />  
-                                            <field name="apply_time" />
-                                            <field name="repay_date" /> 
-                                            <field name="order_status" />
-                                            <field name="collection_stage_setting_id"/>  
-                                            <field name="overdue_days"/>     
-                                            <field name="collector_id" />
+                                            <field name="order_no" string="Order ID"/>
+                                            <field name="product_id" string="Product Name"/>
+                                            <field name="contract_amount" string="Contract Amount"/>
+                                            <field name="loan_period" string="Borrowing cycle"/>
+                                            <field name="pending_amount" string="Bill Amount"/>
+                                            <field name="apply_time" string="Application Date"/>
+                                            <field name="repay_date" string="Due Time of Repayment"/>
+                                            <field name="order_status" string="Order Status"/>
+                                            <field name="collection_stage_setting_id" string="Collection Stage"/>
+                                            <field name="overdue_days" string="Overdue Days"/>
+                                            <field name="collector_id" string="Collector"/>
                                             <button type="object" name="action_show_collection_record"
                                                     string="Collection Record" class="oe_highlight" />
                                         </tree>  

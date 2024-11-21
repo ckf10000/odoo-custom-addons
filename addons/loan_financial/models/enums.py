@@ -1,3 +1,4 @@
+from odoo import _
 PAYMENT_CHANNEL_USE_TYPE = [('1', '放款/退款'), ('2', '还款')]
 
 CHANNEL_FEE_MODE = [('1', '默认模式'), ('2', '阶梯收费')]
@@ -74,17 +75,17 @@ REPAY_RECORD_TYPE = [
 ]
 
 EXTENSION_STATUS = [
-    ('1', '待支付'),
-    ('2', '支付成功'),
-    ('3', '支付失败'),
-    ('4', '部分支付'),
-    ('5', '还款完成'),
-    ('6', '已失效')
+    ('1', _('Pending Payment')),
+    ('2', _('Pay Success')),
+    ('3', _('Pay Failed')),
+    ('4', _('Partial Payment')),
+    ('5', _('Repayment Completed')),
+    ('6', _('Expired'))
 ]
 
 ADDITION_TYPE = [
-    ('1', '还款补单'),
-    ('2', '展期补单')
+    ('1', _('Repayment Reorder')),
+    ('2', _('Extension Application Form'))
 ]
 
 ADDITION_STATUS = [

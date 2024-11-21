@@ -108,32 +108,34 @@
     </record>
 
     <record model="ir.ui.view" id="form_order_additional_record">
-        <field name="name">待还款订单-补单记录</field>
+        <field name="name">Pending Repayment List - Reorder Record</field>
         <field name="model">repay.order</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
                     <group>
-                        <field name="additional_record_ids" nolabel="1" colspan="2" options="{'create': 0}">
+                        <field name="additional_record_ids" string="Reorder Record" nolabel="1" colspan="2" options="{'create': 0}">
                             <tree create="0" edit="0" editable="bottom" delete="0">
-                                <field name="apply_time" optional="show" string="补单时间" />
-                                <field name="addition_type" optional="show" />
-                                <field name="order_user_id" optional="show" />
-                                <field name="order_no" optional="show" />
-                                <field name="utr" optional="show" />
-                                <field name="amount" optional="show" />
-                                <field name="attachment_id" widget="btn_field" />
-                                <field name="apply_user_id" optional="show" />
-                                <field name="close_reason_id" optional="show" />
-                                <field name="approval_user_id" optional="show" />
-                                <field name="status" optional="show" />
+                                <field name="apply_time" optional="show" string="Reorder Time" />
+                                <field name="addition_type" optional="show" string="Business Category"/>
+                                <field name="order_user_id" optional="show" string="UserID"/>
+                                <field name="order_no" optional="show" string="Order ID"/>
+                                <field name="utr" optional="show" string="UTR"/>
+                                <field name="amount" optional="show" string="Reorder Amount"/>
+                                <field name="attachment_id" widget="btn_field" string="Credentials Image"/>
+                                <field name="apply_user_id" optional="show" string="Applicant"/>
+                                <field name="close_reason_id" optional="show"
+                                       string="Associated Reason for Closing the Account"/>
+                                <field name="approval_user_id" optional="show" string="Auditor"/>
+                                <field name="status" optional="show" string="Status"/>
                             </tree>
                         </field>
                     </group>
                 </sheet>
                 <footer>
-                    <button string="取消" class="btn btn-default" special="cancel"/>
-                    <button string="上传凭证" name="action_show_create_additional_record" type="object" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                    <button string="Upload Credentials" name="action_show_create_additional_record"
+                            type="object" class="oe_highlight"/>
                 </footer>
             </form>
         </field>

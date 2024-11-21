@@ -34,8 +34,15 @@ class DerateRecord(models.Model):
 
     def action_show_col_approval_wizard(self):
         approve_flag = self.env.context.get('flag', 0)
+        pass_text = "审核通过" if self.env.user.lang == "zh_CN" else "Approval Pass"
+        refuse_text = "审核拒绝" if self.env.user.lang == "zh_CN" else "Approval Refuse"
+        desc = "是否确定审核" if self.env.user.lang == "zh_CN" else "Are you sure to confirm the review as"
+        result_pass = '通过' if self.env.user.lang == "zh_CN" else "Pass"
+        result_refuse = "拒绝" if self.env.user.lang == "zh_CN" else "Refuse"
+        result = result_pass if approve_flag else result_refuse
+        default_desc = f"{self.derate_amount}, {desc} {result}?"
         return {
-            'name': '审核通过' if approve_flag else '审核拒绝',
+            'name': pass_text if approve_flag else refuse_text,
             'type': 'ir.actions.act_window',
             'res_model': "derate.record.approval.wizard",
             'view_mode': 'form',
@@ -45,7 +52,7 @@ class DerateRecord(models.Model):
                 'dialog_size': self._action_default_size(),
                 'default_derate_id': self.id,
                 'default_status': "2" if approve_flag else "3",
-                'default_desc': f"{self.derate_amount}, 否确定审核{'通过' if approve_flag else '拒绝'}?"
+                'default_desc': default_desc
             }
         }
     
@@ -64,15 +71,24 @@ class DerateRecord(models.Model):
     
     def action_col_derate_batch_approval(self):   
         if not self.ids:
-            raise exceptions.UserError('请先勾选需要批量审核的订单！')
+            msg = "请先勾选需要批量审核的订单！" if self.env.user.lang == "zh_CN" else \
+                "Please first check the orders that require batch review"
+            raise exceptions.UserError(msg)
         return self._action_show_batch_approval_wizard({'default_approval_type': '2'})
     
     def action_show_col_approval(self):
         approve_flag = self.env.context.get('flag', 0)
-        name = '审核通过' if approve_flag else '审核拒绝',
+        pass_text = "审核通过" if self.env.user.lang == "zh_CN" else "Approval Pass"
+        refuse_text = "审核拒绝" if self.env.user.lang == "zh_CN" else "Approval Refuse"
+        name = pass_text if approve_flag else refuse_text
+        desc = "是否确定审核" if self.env.user.lang == "zh_CN" else "Are you sure to confirm the review as"
+        result_pass = '通过' if self.env.user.lang == "zh_CN" else "Pass"
+        result_refuse = "拒绝" if self.env.user.lang == "zh_CN" else "Refuse"
+        result = result_pass if approve_flag else result_refuse
+        default_desc = f"{self.derate_amount}, {desc} {result}?"
         return self._action_show_approval_wizard(name, {
             'default_approval_type': "2",
             'default_approval_result': "2" if approve_flag else "3",
-            'default_desc': f"{self.derate_amount}, 否确定审核{'通过' if approve_flag else '拒绝'}?"
+            'default_desc': default_desc
         })
  

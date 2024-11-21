@@ -682,8 +682,10 @@ class CollectionOrder(models.Model):
 
         # 获取处理状态  
         order_status = self.env['collection.order.status'].sudo().search([('code', '=', '3')], limit=1)  
-        if not order_status:  
-            raise ValidationError("未找到状态为处理中的催收订单。")  
+        if not order_status:
+            msg = "未找到状态为处理中的催收订单。" if self.env.user.lang == "zh_CN" else \
+                "No collection orders in processing status found."
+            raise ValidationError(msg)
 
         # 更新状态和收集员信息  
         self.write({  
@@ -759,7 +761,7 @@ class CollectionUserContact(models.Model):
             ("Brothers", "Brothers"),
             ("Colleague", "Colleague"),
             ("Others", "Others"),
-            ("oneself", "本人"),
+            ("oneself", "Myself"),
         ],
         string=_("Relationship"),
     )
@@ -858,7 +860,7 @@ class HistoryCollectionRecord(models.Model):
             ("Brothers", "Brothers"),
             ("Colleague", "Colleague"),
             ("Others", "Others"),
-            ("oneself", "本人"),
+            ("oneself", "Myself"),
         ],
         string=_("Relationship with the individual"),
         related="user_id.relation_selection",
@@ -866,33 +868,33 @@ class HistoryCollectionRecord(models.Model):
     phone_no = fields.Char(string=_("Follow-up Call"), related="user_id.phone_no")
     collection_type = fields.Selection(
         [
-            ("phone", "电话催收"),
-            ("sms", "短信催收"),
-            ("work_phone", "工作手机催收"),
-            ("customer_service", "客服进线"),
-            ("other", "其他"),
+            ("phone", _("Telecollection")),
+            ("sms", _("Message Collection")),
+            ("work_phone", _("Collection of Working Cellphone")),
+            ("customer_service", _("Incoming Calls of Customer Service")),
+            ("other", _("Other")),
         ],
         string=_("Collection Method"),
     )
     contact_result = fields.Selection(
         [
-            ("联系人造假", "联系人造假"),
-            ("工作信息造假", "工作信息造假"),
-            ("离职", "离职"),
-            ("投诉备注", "投诉备注"),
-            ("失去联系/拒绝转告", "失去联系/拒绝转告"),
-            ("疑似欺诈", "疑似欺诈"),
-            ("另设日期联系", "另设日期联系"),
-            ("声明已缴", "声明已缴"),
-            ("无人接听", "无人接听"),
-            ("忙音/通话中", "忙音/通话中"),
-            ("电话拒接", "电话拒接"),
-            ("关机", "关机"),
-            ("无法接通", "无法接通"),
-            ("短信通知", "短信通知"),
-            ("停机", "停机"),
-            ("空号", "空号"),
-            ("其他", "其他"),
+            ("fake_contacts", _("Fake Contacts")),
+            ("fake_work_info", _("Fake Work Information")),
+            ("work_separation", _("Work Separation")),
+            ("complaint_remark", _("Complaint Remark")),
+            ("lose_touch", _("Lose Touch/Refuse Information Transmitting")),
+            ("suspected_fraud", _("Suspected Fraud")),
+            ("set_another_contact", _("Set Another Date For Contact")),
+            ("stated_settlement", _("Stated Settlement")),
+            ("unanswered", _("Unanswered")),
+            ("phone_busy", _("Phone Busy")),
+            ("phone_reject", _("Phone Reject")),
+            ("shutdown", _("Shutdown")),
+            ("unreachable", _("Unreachable")),
+            ("msg_notification", _("Message Notification")),
+            ("service_halt", _("Phone Service Halt")),
+            ("empty", _("Empty")),
+            ("other", _("Other")),
         ],
         string=_("Contact Result"),
     )

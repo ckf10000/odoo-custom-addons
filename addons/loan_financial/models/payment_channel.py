@@ -70,13 +70,64 @@ class PaymentChannel(models.Model):
             'trade_no': trade_no,
             'platform_order_no': platform_order_no,
             'trade_amount': amount,
-            'trade_status': '1' if res.get('code', 999) == 200 else '3',
             'trade_type': '1',
             'trade_start_time': fields.Datetime.now(),
             'trade_data': res,
         }
         return trade_data, pay_url
     
+    def call_search_order(self, trade_no):
+        """
+        待付订单查询接口
+        """
+        flag = False
+        if self.enum_code == 1:
+            res = pay_utils.coin_pay.search_order({
+                "merchantNo": self.merchant_no,
+                "key": self.merchant_key,
+                "orderNo": trade_no,
+                "timestamp": datetime.datetime.now().astimezone(tz=pytz.timezone( 'Asia/Kolkata' )).strftime('%Y-%m-%d %H:%M:%S')
+            })
+            status = res.get('status', '')
+            if status == "1":
+                trade_status = "2"
+                flag = True
+            
+            platform_order_no = res.get('platformOrderNo')
+            trade_amount = float(res.get('realAmount', 0) )
+            trade_end_time = datetime.datetime.now()
+
+        else:
+            res = pay_utils.coin_pay.search_order({
+                "mchId": int(self.merchant_no),
+                "key": self.merchant_key,
+                "payOrderId": trade_no
+            })
+            status = res.get('data', {}).get('status')
+            if status == "5":
+                trade_status = "3"
+                flag = True
+            elif status == "3":
+                trade_status = "2"
+                flag = True
+
+            platform_order_no = res.get('data', {}).get('payOrderId')
+            trade_amount = round(res.get('data', {}).get('orderAmount', 0) / 100, 2)
+            trade_end_time = res.get('data', {}).get('paySuccessTime')
+            if trade_end_time:
+                trade_end_time = datetime.datetime.fromtimestamp(trade_end_time / 1000)
+            else:
+                trade_end_time = datetime.datetime.now()
+            
+        trade_data = {
+            "trade_status": trade_status,
+            "platform_order_no": platform_order_no,
+            "trade_amount": trade_amount,
+            "trade_end_time": trade_end_time,
+            "trade_data": res
+        }
+        return flag, trade_data
+
     def call_supplement_order(self, utr, trade_no):
         """
         调用补单接口
@@ -192,7 +243,7 @@ class PaymentSetting(models.Model):
     _rec_name = 'payment_channel_id'
 
     use_type = fields.Selection(enums.PAYMENT_CHANNEL_USE_TYPE, string='渠道使用类型', default='1')
-    payment_channel_id = fields.Many2one('payment.channel', string='支付渠道', required=True)
+    payment_channel_id = fields.Many2one('payment.channel', string='支付渠道', required=True, auto_join=True)
     payment_way_id = fields.Many2one('payment.way', string='支付方式', required=True)
     status = fields.Boolean(string='状态', default=True)
 
@@ -292,21 +343,36 @@ class PaymentSettingTradeRecord(models.Model):
     _inherit = ['loan.basic.model']
     _table = 'F_payment_setting_trade_record'
 
-    order_id = fields.Many2one('loan.order', string='订单')
+    order_id = fields.Many2one('loan.order', string='订单', index=True)
     payment_setting_id = fields.Many2one('payment.setting', string='支付渠道')
     payment_way_id = fields.Many2one('payment.way', string='支付方式')
     trade_amount = fields.Float(string='交易金额')
-    trade_status = fields.Selection([('1', '已发起'), ('2', '已成功'), ('3', '已失败')], string='交易状态', required=True)
+    trade_status = fields.Selection([('1', '已发起'), ('2', '已成功'), ('3', '已失败')], string='交易状态', index=True)
     trade_no = fields.Char(string='交易流水号', required=True, index=True)
-    trade_type = fields.Selection([('1', '代收'), ('2', '代付')], string='交易类型', required=True)
-    trade_start_time = fields.Datetime(string='交易发起时间', required=True)
+    trade_type = fields.Selection([('1', '代收'), ('2', '代付')], string='交易类型', index=True)
+    trade_start_time = fields.Datetime(string='交易发起时间', required=True, index=True)
     trade_end_time = fields.Datetime(string='交易完成时间')
     platform_order_no = fields.Char(string='平台订单号')
+    trade_params = fields.Json(string='交易参数')
     trade_data = fields.Json(string='交易结果数据')
 
     res_id = fields.Integer(string='关联记录ID')
     res_model = fields.Char(string='关联记录模型')
 
+    @api.model
+    def task_search_order(self):
+        """
+        订单查询
+        """
+        now = fields.Datetime.now() - datetime.timedelta(hours=12)
+        objs = self.search([('trade_status', '=', '1'), ('trade_type', '=', "2"), ("trade_start_time", "<=", now)])
+        for obj in objs:
+            flag, trade_data = obj.payment_setting_id.payment_channel_id.call_search_order(obj.trade_no)
+            if not flag:
+                continue
+
+            obj.update_data(trade_data)
+            
     def update_data(self, data):
         """
         {
@@ -321,8 +387,7 @@ class PaymentSettingTradeRecord(models.Model):
         """
         self.write(data)
         res_record = self.env[self.res_model].sudo().browse(self.res_id)
-        if self.trade_status == '2':
-            res_record.after_payment(self)
+        res_record.after_payment(self)
 
 
 class PaymentChannelFeeWizard(models.TransientModel):

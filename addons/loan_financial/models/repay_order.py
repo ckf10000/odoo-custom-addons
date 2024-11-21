@@ -127,7 +127,7 @@ class RepayOrder(models.Model):
         显示补单记录
         """
         return {
-            'name': '补单记录',
+            'name': '补单记录' if self.env.user.lang == "zh_CN" else "Reorder Record",
             'type': 'ir.actions.act_window',
             'res_model': "repay.order",
             'res_id': self.id,
@@ -143,7 +143,7 @@ class RepayOrder(models.Model):
         创建补单记录
         """
         return {
-            'name': '补单记录',
+            'name': '补单记录' if self.env.user.lang == "zh_CN" else "Reorder Record",
             'type': 'ir.actions.act_window',
             'res_model': "additional.record",
             'view_mode': 'form',

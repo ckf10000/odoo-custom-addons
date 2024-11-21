@@ -92,6 +92,6 @@ class LoanAppVersion(models.Model):
     download_url = fields.Char(string='下载地址', required=True)
     update_content = fields.Text(string='更新内容', required=True)
     update_mode_id = fields.Many2one('loan.app.update.mode', string='更新类型', required=True)
-    release_type = fields.Selection([('1', '即时发布'), ('2', '定时发布')], string='发布时间', default="1", required=True)
+    release_type = fields.Selection([('0', '即时发布'), ('1', '定时发布')], string='发布时间', default="0", required=True)
     release_time = fields.Datetime(string='定时发布时间')
     status = fields.Boolean(string='状态', default=True)

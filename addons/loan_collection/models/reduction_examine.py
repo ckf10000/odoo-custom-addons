@@ -56,8 +56,11 @@ class LoanReductionExamine(models.Model):
         通过
         """
         form_view_id = self.env.ref('loan_collection.reduction_examine_wizard_audit_fail_form')
+        pass_text = "审核通过" if self.env.user.lang == "zh_CN" else "Approval Pass"
+        display_info = '申请减免金额：%s，是否确定审核通过？' % self.derate_amount if self.env.user.lang == "zh_CN" else \
+            "Aplication of Amount Remission: %s, Are you sure to approve the review?" % self.derate_amount
         return {
-            'name': '审核通过',
+            'name': pass_text,
             'type': 'ir.actions.act_window',
             'res_model': 'reduction.examine.wizard',
             'view_mode': 'form',
@@ -67,7 +70,7 @@ class LoanReductionExamine(models.Model):
                 'default_selected_ids': len(self),
                 'default_flow_type': 'audit',
                 'default_total_annul_amount': self.derate_amount,
-                'default_display_info': '申请减免金额：%s，是否确定审核通过？' % self.derate_amount,
+                'default_display_info': display_info,
                 'dialog_size': self._action_default_size(), **self._action_default_data()}
         }
 
@@ -76,8 +79,11 @@ class LoanReductionExamine(models.Model):
         拒绝
         """
         form_view_id = self.env.ref('loan_collection.reduction_examine_wizard_audit_fail_form')
+        refuse_text = "审核拒绝" if self.env.user.lang == "zh_CN" else "Approval Refuse"
+        display_info = '申请减免金额：%s，是否确定拒绝审核？' % self.derate_amount if self.env.user.lang == "zh_CN" else \
+            "Aplication of Amount Remission: %s, Are you sure to refuse the review?" % self.derate_amount
         return {
-            'name': '审核拒绝',
+            'name': refuse_text,
             'type': 'ir.actions.act_window',
             'res_model': 'reduction.examine.wizard',
             'view_mode': 'form',
@@ -87,7 +93,7 @@ class LoanReductionExamine(models.Model):
                 'default_selected_ids': len(self),
                 'default_flow_type': 'fail',
                 'default_total_annul_amount': self.derate_amount,
-                'default_display_info': '申请减免金额：%s，是否确定拒绝审核？' % self.derate_amount,
+                'default_display_info': display_info,
                 'dialog_size': self._action_default_size(), **self._action_default_data()}
         }
 
@@ -101,12 +107,15 @@ class LoanReductionExamine(models.Model):
         """
         批量审核
         """
+        lang = self.env.user.lang
         if len(self) == 0:
-            raise exceptions.ValidationError('请先勾选需要批量审核的订单！')
+            msg = "请先勾选需要批量审核的订单！" if lang == "zh_CN" else \
+                "Please first check the orders that require batch review"
+            raise exceptions.ValidationError(msg)
         else:
             form_view_id = self.env.ref('loan_collection.reduction_examine_wizard_batch_form')
             return {
-                'name': '批量审核',
+                'name': '批量审核' if lang == "zh_CN" else "Batch Review",
                 'type': 'ir.actions.act_window',
                 'res_model': 'reduction.examine.wizard',
                 'view_mode': 'form',
@@ -127,7 +136,7 @@ class LoanReductionExamine(models.Model):
 
         form_view_id = self.env.ref('loan_collection.auto_examine_form')
         return {
-            'name': '自动审核配置',
+            'name': '自动审核配置' if self.env.user.lang == "zh_CN" else "Auto Review Configuration",
             'type': 'ir.actions.act_window',
             'res_model': 'auto.examine',
             'res_id': self.env['auto.examine'].search([], limit=1).id,

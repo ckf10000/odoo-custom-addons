@@ -133,6 +133,27 @@ class CoinPayService(object):
             _logger.error(f"[sf_pay]create_transfer_order error: {e}, params: {params}")
             return {"code": 999, "message": f"请求失败, 原因：{e}"}
 
+    def search_order(self, params):
+        """
+        订单查询接口
+        params: {
+            "mchId": "商户号",
+            "key": "商户密钥",
+            "payOrderId": "平台订单号",
+        }
+        """
+        url = "https://coin-pay.vip/api/pay/query_order"
+        params["sign"] = self._sign(params)
+        try:
+            res = requests.post(url, data=params).json()
+            _logger.info(params)
+            _logger.info(res)
+            return res
+        except Exception as e:
+            _logger.error(f"[sf_pay]search_order error: {e}, params: {params}")
+            return {"code": 999, "message": f"请求失败, 原因：{e}"}
+        
+
     def create_supplement_order(self, params):
         """
         补单接口

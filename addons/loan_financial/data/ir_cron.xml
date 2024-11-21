@@ -32,4 +32,15 @@
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
     </record>
+
+    <record id="ir_cron_pay_channel_search_order" model="ir.cron">
+        <field name="name">支付订单查询任务</field>
+        <field name="model_id" ref="model_payment_setting_trade_record"/>
+        <field name="state">code</field>
+        <field name="code">model.task_search_order()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">12</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+    </record>
 </odoo>

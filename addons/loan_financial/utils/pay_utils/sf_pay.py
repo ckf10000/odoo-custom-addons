@@ -114,6 +114,42 @@ class SFPayService(object):
             _logger.error(f"[sf_pay]create_transfer_order error: {e}, params: {params}")
             return {"code": 999, "message": f"请求失败, 原因：{e}"}
 
+    def search_order(self, params):
+        """
+        查询接口
+        :params: {
+            'merchantNo: '商户号'  # 分配给各合作商户的唯一识别码
+            'key': '密钥'  # 分配给各合作商户的唯一识别码
+            'orderNo': '商户订单号'    # 本系统支付记录的唯一识别码
+            'timestamp': '请求时间'  # yyyy-MM-dd HH:mm:ss, 请求时间，以印度标准时间 (GMT+5:30)为准,误差不允许超过5分钟
+        } 
+
+        接口返回：
+        {
+            "code":0,
+            "message":null,
+            "version":null,
+            "merchantNo":"f3c2d1f505d4dfe12439451b37cb9c46",
+            "amount": "100.00",
+            "realAmount": "100.00",
+            "orderFee": "0.00",
+            "orderNo":"2024020115495258",
+            "platformOrderNo": "2024020115495258",
+            "status": 2, # 同步返回订单状态为 2,处理中;（后续通过异步通知或查询最终结果）
+            "sign": "C3476440ED44272FBC9435C0DCCFC219"
+        }
+        """
+        url = "https://api.mwxpa.com/api/indiapApi/pay/v2/apiQuery"
+        params["sign"] = self._sign(params)
+        headers = {"Content-Type": "application/json; charset=utf-8"}
+        try:
+            res = requests.post(url, json=params, headers=headers).json()
+            # _logger.info(f"[sf_pay]search_order res: {res}, params: {params}")
+            return res
+        except Exception as e:
+            _logger.error(f"[sf_pay]search_order error: {e}, params: {params}")
+            return {"code": 999, "message": f"请求失败, 原因：{e}"}
+        
     def create_supplement_order(self, params):
         """
         补单接口

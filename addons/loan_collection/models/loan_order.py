@@ -35,7 +35,7 @@ class LoanOrder(models.Model):
     def action_show_collection_record(self):
         self.ensure_one()
         return {
-            'name': '催收记录',
+            'name': '催收记录' if self.env.user.lang == "zh_CN" else "Collection Record",
             'type': 'ir.actions.act_window',
             'res_model': 'history.collection.record',
             'view_mode': 'tree',

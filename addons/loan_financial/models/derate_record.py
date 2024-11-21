@@ -1,5 +1,5 @@
 import logging
-from odoo import models, fields, api, exceptions
+from odoo import models, fields, api, exceptions, _
 from . import enums
 
 
@@ -152,7 +152,7 @@ class DerateRecord(models.Model):
             'dialog_size': self._action_default_size(),
         })
         return {
-            'name': '自动审核配置',
+            'name': '自动审核配置' if self.env.user.lang == "zh_CN" else "Auto Review Configuration",
             'type': 'ir.actions.act_window',
             'res_model': "derate.record.setting.wizard",
             'view_mode': 'form',
@@ -200,15 +200,17 @@ class DerateRecord(models.Model):
         })
     
     def _action_show_batch_approval_wizard(self, context):
+        lang = self.env.user.lang
         amount = round(sum(self.mapped(lambda x: x.derate_amount)), 2)
+        text = "合计申请减免金额" if lang == "zh_CN" else "Aplication of Amount Remission"
         context = {
             'dialog_size': self._action_default_size(),
             'default_derate_record_ids': self.ids,
-            'default_desc': f"{len(self.ids)}, 合计申请减免金额:{amount}",
+            'default_desc': f"{len(self.ids)}, {text}:{amount}",
             **context
         }
         return {
-            'name': '批量审核',
+            'name': '批量审核' if lang == "zh_CN" else "Batch Review",
             'type': 'ir.actions.act_window',
             'res_model': "derate.record.batch.approval.wizard",
             'view_mode': 'form',
@@ -314,13 +316,13 @@ class DerateRecordBatchApprovalWizard(models.TransientModel):
     approval_type = fields.Selection([('1', '财务'), ('2', '催收')], string="审核类型")
     derate_record_ids = fields.Json(string='减免记录', required=True)
     desc = fields.Char(string='已选择订单数量')
-    approval_result = fields.Selection([('2', '通过'), ('3', '拒绝')], string='批量审核')
+    approval_result = fields.Selection([('2', _('Pass')), ('3', _('Refuse'))], string='批量审核')
     remark = fields.Text(string='备注', required=True)
 
     @api.onchange("approval_result")
     def _onchange_approval_result(self):
         if self.approval_result == '2':
-            self.remark = '无异常通过'
+            self.remark = '无异常通过' if self.env.user.lang == "zh_CN" else "Cleared without any issues"
         else:
             self.remark = ''
 

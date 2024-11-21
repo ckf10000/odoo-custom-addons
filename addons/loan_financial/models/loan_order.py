@@ -79,7 +79,7 @@ class LoanOrder(models.Model):
     is_extension = fields.Boolean(string='是否展期', default=False)
     extend_success_time = fields.Datetime('展期成功时间')
     extend_pay_amount = fields.Float('展期金额', digits=(16, 2))
-    # order_id = fields.Many2one('loan.order', string='原订单编号')
+    extension_order_id = fields.Many2one('loan.order', '展期订单')
 
     @api.depends('apply_time', 'order_status')
     def _compute_wait_duration(self):
@@ -323,12 +323,18 @@ class LoanOrder(models.Model):
                 'order_status': '8',
                 'repay_complete_time': op_time
             })
-            self.update_bill_order({
+            # 更新贷超订单
+            bill_data = {
                 "bill_status": 4,
                 "pending_amount": 0,
                 "repay_completion_time": int(op_time.timestamp()),
+                "repayed_amount": self.repayed_amount,
                 "overdue_flag": False
-            })
+            }
+            if self.is_extension:
+                bill_data['extension_bill_id'] = self.extension_order_id.bill_id
+            self.update_bill_order(bill_data)
+            # 更新贷超用户
             self.update_bill_user_status()
         else:
             self.write({
@@ -338,7 +344,8 @@ class LoanOrder(models.Model):
             self.update_bill_order({
                 "bill_status": 2,
                 "pending_amount": self.pending_amount,
-                "repay_completion_time": 0
+                "repay_completion_time": 0,
+                "repayed_amount": self.repayed_amount
             })
     
     def get_pay_order(self):
@@ -433,7 +440,8 @@ class LoanOrder(models.Model):
                 "repay_status": "1"
             })]
         }
-        self.create(order_data)
+        new_order = self.create(order_data)
+        return new_order
 
     def extension_success(self, extension_amount, extension_success_time ):
         """
@@ -446,12 +454,13 @@ class LoanOrder(models.Model):
         6. 创建新的贷超订单
         """
         # 创建新的财务订单
-        self.create_new_order(extension_amount, extension_success_time)
+        new_order = self.create_new_order(extension_amount, extension_success_time)
         
         self.write({
             'is_extension': True, 
             'extend_success_time': extension_success_time,
             'extend_pay_amount': extension_amount,
+            'extension_order_id': new_order.id,
         })
         
         self.update_order_status(extension_success_time)
@@ -501,7 +510,7 @@ class LoanOrder(models.Model):
         """
         if self.env.context.get('batch_approve_flag'):
             return {
-                'name': '批量审核',
+                'name': '批量审核' if self.env.user.lang == "zh_CN" else "Batch Review",
                 'type': 'ir.actions.act_window',
                 'res_model': "pay.order.batch.approval.wizard",
                 'view_mode': 'form',
@@ -538,7 +547,7 @@ class LoanOrder(models.Model):
         """
         repay_order = self.get_repay_order()
         return {
-            'name': '补单记录',
+            'name': '补单记录' if self.env.user.lang == "zh_CN" else "Reorder Record",
             'type': 'ir.actions.act_window',
             'res_model': "repay.order",
             'res_id': repay_order.id,

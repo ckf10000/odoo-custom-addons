@@ -150,6 +150,9 @@ msgstr "预期天数上限值为999"
 #: model:ir.model.fields,field_description:loan_collection.field_history_collection_record__collection_stage
 #: model:ir.model.fields,field_description:loan_collection.field_history_loans_record__collection_stage
 #: model:ir.model.fields,field_description:loan_collection.field_manual_allocation_wizard__collection_stage
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:249
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:197
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:192
 msgid "Collection Stage"
 msgstr "催收阶段"
 
@@ -160,6 +163,9 @@ msgstr "催收阶段"
 #: model:ir.model.fields,field_description:loan_collection.field_collection_order__overdue_days
 #: model:ir.model.fields,field_description:loan_collection.field_history_collection_record__overdue_days
 #: model:ir.model.fields,field_description:loan_collection.field_history_loans_record__overdue_days
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:250
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:198
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:193
 msgid "Overdue Days"
 msgstr "逾期天数"
 
@@ -496,6 +502,9 @@ msgstr "关联用户"
 #: model_terms:ir.ui.view,arch_db:loan_collection.search_additional_record_col:31
 #: model_terms:ir.ui.view,arch_db:loan_collection.search_extension_record_col:41
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_extension_record_col:9
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:241
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:189
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:184
 msgid "Order ID"
 msgstr "订单编号"
 
@@ -529,6 +538,9 @@ msgstr "手机号码"
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_derate_record_col:82
 #: model_terms:ir.ui.view,arch_db:loan_collection.search_derate_record_col:112
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_extension_record_col:16
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:246
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:194
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:189
 msgid "Application Date"
 msgstr "申请时间"
 
@@ -536,6 +548,9 @@ msgstr "申请时间"
 #. module: loan_collection
 #: model:ir.model.fields,field_description:loan_collection.field_collection_order__contract_amount
 #: model:ir.model.fields,field_description:loan_collection.field_history_loans_record__contract_amount
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:243
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:191
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:186
 msgid "Contract Amount"
 msgstr "合同金额"
 
@@ -547,6 +562,15 @@ msgid "Borrowing cycle（Days)"
 msgstr "借款期限(天)"
 
 
+
+#. module: loan_collection
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:244
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:192
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:187
+msgid "Borrowing cycle"
+msgstr "借款期限"
+
+
 #. module: loan_collection
 #: model:ir.model.fields,field_description:loan_collection.field_collection_order__product_id
 #: model:ir.model.fields,field_description:loan_collection.field_history_loans_record__product_id
@@ -555,6 +579,9 @@ msgstr "借款期限(天)"
 #: model_terms:ir.ui.view,arch_db:loan_collection.search_derate_record_col:110
 #: model_terms:ir.ui.view,arch_db:loan_collection.search_extension_record_col:45
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_extension_record_col:15
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:242
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:190
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:185
 msgid "Product Name"
 msgstr "产品名称"
 
@@ -607,6 +634,9 @@ msgstr "放款序列号"
 
 #. module: loan_collection
 #: model:ir.model.fields,field_description:loan_collection.field_collection_order__repay_date
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:247
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:195
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:190
 msgid "Due Time of Repayment"
 msgstr "应还日期"
 
@@ -647,6 +677,9 @@ msgstr "已还款金额"
 #. module: loan_collection
 #: model:ir.model.fields,field_description:loan_collection.field_collection_order_pending_amount
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_derate_record_col_s1:41
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:245
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:193
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:188
 msgid "Bill Amount"
 msgstr "挂账金额"
 
@@ -937,6 +970,9 @@ msgstr "证件号码"
 #: model:ir.model.fields,field_description:loan_collection.field_history_collection_record__collector_id
 #: model:ir.model.fields,field_description:loan_collection.field_history_loans_record__collector_id
 #: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:174
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:251
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:199
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:194
 msgid "Collector"
 msgstr "催收员"
 
@@ -1354,6 +1390,7 @@ msgstr "<p>是否确定删除该条催收阶段配置？</p>"
 #. module: loan_collection
 #: model_terms:ir.ui.view,arch_db:loan_collection.collection_stage_setting_wizard_delete_form:15
 #: model_terms:ir.ui.view,arch_db:loan_collection.form_derate_record_col_apply:139
+#: model_terms:ir.ui.view,arch_db:loan_collection.auto_examine_form:16
 msgid "Submit"
 msgstr "确认"
 
@@ -1362,7 +1399,7 @@ msgstr "确认"
 #. module: loan_collection
 #: model_terms:ir.ui.view,arch_db:loan_collection.collection_stage_setting_wizard_delete_form:17
 #: model_terms:ir.ui.view,arch_db:loan_collection.form_derate_record_col_apply:138
-#: model_terms:ir.ui.view,arch_db:loan_collection.form_derate_record_col_apply:138
+#: model_terms:ir.ui.view,arch_db:loan_collection.auto_examine_form:18
 msgid "Cancel"
 msgstr "取消"
 
@@ -1392,6 +1429,7 @@ msgstr "批量审核"
 
 #. module: loan_collection
 #: model_terms:ir.ui.view,arch_db:loan_collection.list_derate_record_col_s1:32
+#: model_terms:ir.ui.view,arch_db:loan_collection.auto_examine_form:5
 msgid "Auto Review Configuration"
 msgstr "自动审核配置"
 
@@ -1744,23 +1782,12 @@ msgstr "平账"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#. module: loan_collection
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_allot_form:248
+#: model_terms:ir.ui.view,arch_db:loan_collection.collection_order_process_form:196
+#: model_terms:ir.ui.view,arch_db:loan_collection.form_collection_order:191
+msgid "Order Status"
+msgstr "订单状态"
 
 
 
@@ -1804,6 +1831,10 @@ msgstr "黑名单管理"
 
 #. module: loan_financial
 #: model_terms:ir.ui.view,arch_db:loan_financial.form_black_list:58
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:22
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_derate_setting:135
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:179
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_approval:157
 msgid "Submit"
 msgstr "确认"
 
@@ -1811,6 +1842,10 @@ msgstr "确认"
 
 #. module: loan_financial
 #: model_terms:ir.ui.view,arch_db:loan_financial.form_black_list:59
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:21
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_derate_setting:134
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:178
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_approval:156
 msgid "Cancel"
 msgstr "取消"
 
@@ -1921,16 +1956,533 @@ msgstr "删除后不可恢复, 确认删除?"
 
 
 
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__collection_type__phone
+msgid "Telecollection"
+msgstr "电话催收"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__collection_type__sms
+msgid "Message Collection"
+msgstr "短信催收"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__collection_type__work_phone
+msgid "Collection of Working Cellphone"
+msgstr "工作手机催收"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__collection_type__customer_service
+msgid "Incoming Calls of Customer Service"
+msgstr "客服进线"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__collection_type__other
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__other
+msgid "Other"
+msgstr "其他"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__fake_contacts
+msgid "Fake Contacts"
+msgstr "联系人造假"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__fake_work_info
+msgid "Fake Work Information"
+msgstr "工作信息造假"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__work_separation
+msgid "Work Separation"
+msgstr "离职"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__complaint_remark
+msgid "Complaint Remark"
+msgstr "投诉备注"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__lose_touch
+msgid "Lose Touch/Refuse Information Transmitting"
+msgstr "失去联系/拒绝转告"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__suspected_fraud
+msgid "Suspected Fraud"
+msgstr "疑似欺诈"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__set_another_contact
+msgid "Set Another Date For Contact"
+msgstr "另设日期联系"
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__stated_settlement
+msgid "Stated Settlement"
+msgstr "声明已缴"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__unanswered
+msgid "Unanswered"
+msgstr "无人接听"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__phone_busy
+msgid "Phone Busy"
+msgstr "忙音/通话中"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__phone_reject
+msgid "Phone Reject"
+msgstr "电话拒接"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__shutdown
+msgid "Shutdown"
+msgstr "关机"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__unreachable
+msgid "Unreachable"
+msgstr "无法接通"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__msg_notification
+msgid "Message Notification"
+msgstr "短信通知"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__service_halt
+msgid "Phone Service Halt"
+msgstr "停机"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__history_collection_record__contact_result__empty
+msgid "Empty"
+msgstr "空号"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__order_type__1
+msgid "First-time Loan"
+msgstr "首贷"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__order_type__2
+msgid "Re-Loan"
+msgstr "复贷"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__1
+msgid "Pending Assignment"
+msgstr "待分配"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__2
+msgid "Allocated"
+msgstr "已分配"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__3
+msgid "Pending Loan Release"
+msgstr "待放款"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__4
+msgid "In the loan"
+msgstr "放款中"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__5
+msgid "Loan Success"
+msgstr "放款成功"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__6
+msgid "Loan Failed"
+msgstr "放款失败"
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__7
+msgid "Pending Repayment"
+msgstr "待还款"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__8
+msgid "Overdue"
+msgstr "已逾期"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__9
+msgid "Settled Repayment"
+msgstr "已还款"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__collection_order__loan_order_status_id__99
+msgid "Refused"
+msgstr "已拒绝"
+
+
+
+
+
+#. module: loan_collection
+#: model_terms:ir.ui.view,arch_db:loan_collection.auto_examine_form:5
+msgid "Delete"
+msgstr "删除"
 
 
 
 
 
 
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__1
+msgid "Pending Payment"
+msgstr "待支付"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__2
+msgid "Pay Succeed"
+msgstr "支付成功"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__3
+msgid "Pay Failed"
+msgstr "支付失败"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__4
+msgid "Partial Payment"
+msgstr "部分支付"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__5
+msgid "Repayment Completed"
+msgstr "还款完成"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__extension_record__status__6
+msgid "Expired"
+msgstr "已失效"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:111
+msgid "Pending Repayment List - Reorder Record"
+msgstr "待还款订单-补单记录"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:117
+msgid "Reorder Record"
+msgstr "补单记录"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:119
+msgid "Reorder Time"
+msgstr "补单时间"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:120
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:17
+msgid "Business Category"
+msgstr "业务类型"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:121
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:14
+msgid "UserID"
+msgstr ""
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:122
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:13
+msgid "Order ID"
+msgstr "订单编号"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:123
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:15
+msgid "UTR"
+msgstr ""
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:124
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:16
+msgid "Reorder Amount"
+msgstr "补单金额"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:125
+msgid "Credentials Image"
+msgstr "凭证图片"
 
 
 
 
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:126
+msgid "Applicant"
+msgstr "申请人"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:128
+msgid "Associated Reason for Closing the Account"
+msgstr "关联关单原因"
+
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:129
+msgid "Auditor"
+msgstr "审核人"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:130
+msgid "Status"
+msgstr "状态"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:136
+msgid "Cancel"
+msgstr "取消"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_order_additional_record:137
+msgid "Upload Credentials"
+msgstr "上传凭证"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:5
+msgid "Reorder Record Form"
+msgstr "补单记录表单"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:11
+msgid "Repayment Order"
+msgstr "还款订单"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:12
+msgid "Financial Order"
+msgstr "财务订单"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.form_additional_record:18
+msgid "Credentials"
+msgstr "凭证"
+
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__additional_record__addition_type__1
+msgid "Repayment Reorder"
+msgstr "还款补单"
+
+
+
+
+#. module: loan_collection
+#: model:ir.model.fields.selection,name:loan_collection.selection__additional_record__addition_type__2
+msgid "Extension Application Form"
+msgstr "展期补单"
+
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_derate_setting:123
+msgid "Remission Record Configuration Wizard"
+msgstr "减免记录配置向导"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_derate_setting:129
+msgid "Is Enable Automatic Review"
+msgstr "自动审核"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_derate_setting:130
+msgid "Max Remission Amount"
+msgstr "最大减免金额"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:164
+msgid "Amount Remission Batch Review"
+msgstr "金额减免批量审核"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:172
+msgid "The Selected Order Quantity"
+msgstr "已选择订单数量"
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:173
+msgid "Batch Review"
+msgstr "批量审核"
+
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_batch_approval:174
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_approval:152
+msgid "Remark"
+msgstr "备注"
+
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__derate_record_batch_approval_wizard__approval_result__2
+msgid "Pass"
+msgstr "通过"
+
+
+#. module: loan_financial
+#: model:ir.model.fields.selection,name:loan_financial.selection__derate_record_batch_approval_wizard__approval_result__3
+msgid "Refuse"
+msgstr "拒绝"
+
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_approval:142
+msgid "Review of Amount Remission Wizard"
+msgstr "金额减免审核向导"
+
+
+
+#. module: loan_financial
+#: model_terms:ir.ui.view,arch_db:loan_financial.wizard_fin_derate_approval:151
+msgid "Aplication of Amount Remission"
+msgstr "申请减免金额"
 
 
 

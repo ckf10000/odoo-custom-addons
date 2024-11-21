@@ -1,4 +1,6 @@
-# Gender  
+from odoo import _
+
+# Gender
 GENDER = [  
     ('1', 'male'),  
     ('2', 'female')  
@@ -103,20 +105,20 @@ CONTACT_TYPE = [
     ('99', 'Other')  
 ]
 
-ORDER_TYPE = [('1', '首贷'), ('2', '复贷')]
+ORDER_TYPE = [('1', _('First-time Loan')), ('2', _('Re-Loan'))]
 
 
 ORDER_STATUS = [
-    ('1', '待分配'), 
-    ('2', '已分配'), 
-    ('3', '待放款'), 
-    ('4', '放款中'),
-    ('5', '放款成功'),
-    ('6', '放款失败'),
-    ('7', '待还款'),
-    ('8', '已逾期'),
-    ('9', '已还款'),
-    ('99', '已拒绝'),
+    ('1', _('Pending Assignment')),
+    ('2', _('Allocated')),
+    ('3', _('Pending Loan Release')),
+    ('4', _('In the loan')),
+    ('5', _('Loan Success')),
+    ('6', _('Loan Failed')),
+    ('7', _('Pending Repayment')),
+    ('8', _('Overdue')),
+    ('9', _('Settled Repayment')),
+    ('99', _('Refused')),
 ]
 
 AUDIT_RESULT = [
